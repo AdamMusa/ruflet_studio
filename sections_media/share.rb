@@ -7,7 +7,6 @@ module RufletStudio
   module SectionsMedia
     def build_share(page, _status)
       page.service(:share)
-      page.service(:storage_paths)
 
       status_text = text(value: "")
       raw_text = text(value: "")
