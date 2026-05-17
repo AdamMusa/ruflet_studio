@@ -52,6 +52,8 @@ module RufletStudio
                   picker_in_flight = true
                   page.update(save_file_path, value: "Opening save dialog...")
                   page.save_file(
+                    file_name: "ruflet_sample.txt",
+                    src_bytes: "Saved from Ruflet Studio\n".b,
                     on_result: lambda { |result, error|
                       picker_in_flight = false
                       if error && !error.to_s.empty?
