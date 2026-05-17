@@ -55,7 +55,7 @@ module RufletStudio
           page.share_files(
             [
               {
-                "data" => "Sample content from memory".bytes,
+                "data" => "Sample content from memory".b,
                 "mime_type" => "text/plain",
                 "name" => "sample.txt"
               }

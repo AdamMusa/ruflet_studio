@@ -28,7 +28,7 @@ module RufletStudio
                 page.update(state_text, value: "Clipboard error: #{error}")
                 next
               end
-              page.update(files_column, controls: [])
+              page.update(files_column, children: [])
               page.update(state_text, value: "Set #{sample_files.length} file references to clipboard (result: #{result}).")
             }
           )
@@ -42,7 +42,7 @@ module RufletStudio
             on_result: lambda { |result, error|
               if error && !error.to_s.empty?
                 page.update(state_text, value: "Clipboard error: #{error}")
-                page.update(files_column, controls: [])
+                page.update(files_column, children: [])
                 next
               end
 
@@ -55,7 +55,7 @@ module RufletStudio
               end
 
               page.update(state_text, value: "Read #{paths.length} file reference(s) from clipboard.")
-              page.update(files_column, controls: rows)
+              page.update(files_column, children: rows)
             }
           )
         end
@@ -73,7 +73,8 @@ module RufletStudio
               if result.nil? || result.to_s.empty?
                 page.update(state_text, value: "No image in clipboard.")
               else
-                page.update(state_text, value: "Clipboard image available (#{result.to_s.bytesize} bytes payload).")
+                size = result.respond_to?(:bytesize) ? result.bytesize : result.to_s.bytesize
+                page.update(state_text, value: "Clipboard image available (#{size} bytes).")
               end
             }
           )
