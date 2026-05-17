@@ -49,6 +49,7 @@ module RufletStudio
         tile(page, "grid_on", "Minesweeper", "/minesweeper"),
         tile(page, "search", "Icon Search", "/icon-search"),
         tile(page, "animation", "Ruflet Animation", "/animation"),
+        tile(page, Ruflet::MaterialIcons::SPEED, "Accelerometer", "/accelerometer"),
         tile(page, "music_note", "Audio Player", "/audio"),
         tile(page, "video_library", "Video Player", "/video"),
         tile(page, "battery_6_bar", "Battery", "/battery"),

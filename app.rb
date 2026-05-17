@@ -79,6 +79,9 @@ module RufletStudio
       when "/animation"
         page.views = [detail_view(page, "Ruflet Animation", build_animation(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/animation.rb")]
+      when "/accelerometer"
+        page.views = [detail_view(page, "Accelerometer", build_accelerometer(page, status_text(page)),
+                                  source_path: "ruflet_studio/sections_media/accelerometer.rb")]
       when "/audio"
         page.views = [detail_view(page, "Audio Player", build_audio(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/audio.rb")]
