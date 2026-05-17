@@ -3,6 +3,8 @@
 module RufletStudio
   module SectionsMedia
     def build_file_picker(page, status)
+      page.service(:file_picker)
+
       selected_files = text(value: "")
       save_file_path = text(value: "")
       directory_path = text(value: "")

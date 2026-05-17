@@ -3,6 +3,7 @@
 module RufletStudio
   module SectionsMedia
     def build_screen_brightness(page, _status)
+      page.service(:screen_brightness)
       screen_brightness = page.screen_brightness
       info_text = text(value: "Application brightness: -\nSystem brightness: -\nSystem change: -\nAnimate: -\nAuto reset: -")
 

@@ -6,6 +6,8 @@ require "fileutils"
 module RufletStudio
   module SectionsMedia
     def build_clipboard(page, _status)
+      page.service(:clipboard)
+
       state_text = text(value: "")
       files_column = column(horizontal_alignment: Ruflet::CrossAxisAlignment::CENTER, spacing: 0, children: [])
 
