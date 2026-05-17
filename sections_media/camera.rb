@@ -10,6 +10,9 @@ module RufletStudio
       )
       camera_busy = false
       open_button = nil
+      take_picture_button = nil
+      initialized = false
+      last_picture = text(value: "")
 
       preview = container(
         visible: false,
@@ -64,7 +67,9 @@ module RufletStudio
                   if init_error && !init_error.to_s.empty?
                     page.update(status, value: "Camera error: #{init_error}")
                   else
+                    initialized = true
                     page.update(preview, visible: true)
+                    page.update(take_picture_button, disabled: false)
                     page.update(status, value: "Camera initialized.")
                   end
                 }
@@ -74,12 +79,41 @@ module RufletStudio
         end
       )
 
+      take_picture_button = button(
+        content: text(value: "Take picture"),
+        disabled: true,
+        on_click: ->(_e) do
+          unless initialized
+            page.update(status, value: "Initialize camera first.")
+            next
+          end
+
+          page.update(status, value: "Taking picture...")
+          page.invoke(
+            camera,
+            "take_picture",
+            timeout: 45,
+            on_result: lambda { |result, error|
+              if error && !error.to_s.empty?
+                page.update(status, value: "Camera error: #{error}")
+                next
+              end
+
+              bytes = result.respond_to?(:bytesize) ? result.bytesize : Array(result).length
+              page.update(last_picture, value: "Last picture: #{bytes} bytes")
+              page.update(status, value: "Picture captured.")
+            }
+          )
+        end
+      )
+
       column(
         spacing: 10,
         children: [
           status,
-          open_button,
+          row(spacing: 8, wrap: true, children: [open_button, take_picture_button]),
           text(value: "Tap Open camera to initialize and show preview.", style: { size: 12 }),
+          last_picture,
           preview
         ]
       )

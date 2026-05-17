@@ -17,7 +17,7 @@ module RufletStudio
       add_row = lambda do |label, value|
         rows = Array(rows_column.children)
         rows << text(value: "#{label}: #{pretty_value.call(value)}")
-        page.update(rows_column, controls: rows)
+        page.update(rows_column, children: rows)
       end
 
       fail_row = lambda do |label, error|
@@ -25,16 +25,16 @@ module RufletStudio
       end
 
       fetches = [
-        ["Application cache directory", ->(cb) { page.get_application_cache_directory(timeout: nil, on_result: cb) }],
-        ["Application documents directory", ->(cb) { page.get_application_documents_directory(timeout: nil, on_result: cb) }],
-        ["Application support directory", ->(cb) { page.get_application_support_directory(timeout: nil, on_result: cb) }],
-        ["Downloads directory", ->(cb) { page.get_downloads_directory(timeout: nil, on_result: cb) }],
-        ["External cache directories", ->(cb) { page.get_external_cache_directories(timeout: nil, on_result: cb) }],
-        ["External storage directories", ->(cb) { page.get_external_storage_directories(timeout: nil, on_result: cb) }],
-        ["Library directory", ->(cb) { page.get_library_directory(timeout: nil, on_result: cb) }],
-        ["External storage directory", ->(cb) { page.get_external_storage_directory(timeout: nil, on_result: cb) }],
-        ["Temporary directory", ->(cb) { page.get_temporary_directory(timeout: nil, on_result: cb) }],
-        ["Console log filename", ->(cb) { page.get_console_log_filename(timeout: nil, on_result: cb) }]
+        ["Application cache directory", ->(cb) { page.get_application_cache_directory(on_result: cb) }],
+        ["Application documents directory", ->(cb) { page.get_application_documents_directory(on_result: cb) }],
+        ["Application support directory", ->(cb) { page.get_application_support_directory(on_result: cb) }],
+        ["Downloads directory", ->(cb) { page.get_downloads_directory(on_result: cb) }],
+        ["External cache directories", ->(cb) { page.get_external_cache_directories(on_result: cb) }],
+        ["External storage directories", ->(cb) { page.get_external_storage_directories(on_result: cb) }],
+        ["Library directory", ->(cb) { page.get_library_directory(on_result: cb) }],
+        ["External storage directory", ->(cb) { page.get_external_storage_directory(on_result: cb) }],
+        ["Temporary directory", ->(cb) { page.get_temporary_directory(on_result: cb) }],
+        ["Console log filename", ->(cb) { page.get_console_log_filename(on_result: cb) }]
       ]
 
       run_next = nil

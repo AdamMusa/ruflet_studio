@@ -3,8 +3,15 @@
 module RufletStudio
   module SectionsMedia
     def build_connectivity(page, status)
-      page.service(:connectivity)
       current_text = text(value: "")
+      page.service(
+        :connectivity,
+        on_change: lambda { |event|
+          values = Array(event&.data).map(&:to_s)
+          label = values.empty? ? "none" : values.join(", ")
+          page.update(current_text, value: label)
+        }
+      )
 
       column(
         spacing: 12,
@@ -17,7 +24,6 @@ module RufletStudio
                 icon: "wifi",
                 on_click: ->(_e) do
                   page.get_connectivity(
-                    timeout: nil,
                     on_result: lambda { |result, error|
                       if error && !error.to_s.empty?
                         page.update(current_text, value: "Connectivity error: #{error}")
