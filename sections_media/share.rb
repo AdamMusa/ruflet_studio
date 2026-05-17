@@ -11,8 +11,10 @@ module RufletStudio
 
       status_text = text(value: "")
       raw_text = text(value: "")
+      share_in_flight = false
 
       update_result = lambda do |result, error|
+        share_in_flight = false
         if error && !error.to_s.empty?
           page.update(status_text, value: "Share error: #{error}")
           page.update(raw_text, value: "")
@@ -28,9 +30,29 @@ module RufletStudio
         page.update(raw_text, value: "Raw: #{raw_value}")
       end
 
+      share_sample_file_from_bytes = lambda do |text_value|
+        page.share_files(
+          [
+            {
+              "data" => "Sample content from file path\n".b,
+              "mime_type" => "text/plain",
+              "name" => "sample_from_path.txt"
+            }
+          ],
+          text: text_value,
+          download_fallback_enabled: true,
+          mail_to_fallback_enabled: true,
+          timeout: 30,
+          on_result: update_result
+        )
+      end
+
       share_text_btn = button(
         content: "Share text",
         on_click: ->(_e) do
+          next if share_in_flight
+
+          share_in_flight = true
           page.update(status_text, value: "Opening share sheet...")
           page.update(raw_text, value: "")
           page.share_text(
@@ -39,6 +61,7 @@ module RufletStudio
             subject: "Greeting",
             download_fallback_enabled: true,
             mail_to_fallback_enabled: true,
+            timeout: 30,
             on_result: update_result
           )
         end
@@ -47,10 +70,14 @@ module RufletStudio
       share_link_btn = button(
         content: "Share link",
         on_click: ->(_e) do
+          next if share_in_flight
+
+          share_in_flight = true
           page.update(status_text, value: "Opening share sheet...")
           page.update(raw_text, value: "")
           page.share_uri(
             "https://ruflet.dev",
+            timeout: 30,
             on_result: update_result
           )
         end
@@ -59,6 +86,9 @@ module RufletStudio
       share_bytes_btn = button(
         content: "Share file from bytes",
         on_click: ->(_e) do
+          next if share_in_flight
+
+          share_in_flight = true
           page.update(status_text, value: "Opening share sheet...")
           page.update(raw_text, value: "")
           page.share_files(
@@ -72,6 +102,7 @@ module RufletStudio
             text: "Sharing a file from memory",
             download_fallback_enabled: true,
             mail_to_fallback_enabled: true,
+            timeout: 30,
             on_result: update_result
           )
         end
@@ -80,55 +111,32 @@ module RufletStudio
       share_path_btn = button(
         content: "Share file from path",
         on_click: ->(_e) do
+          next if share_in_flight
+
+          share_in_flight = true
           page.update(status_text, value: "Preparing file for share...")
           page.update(raw_text, value: "")
-          page.get_temporary_directory(
-            on_result: lambda { |temp_dir, temp_error|
-              if temp_error && !temp_error.to_s.empty?
-                page.update(status_text, value: "Storage paths error: #{temp_error}")
-                page.update(raw_text, value: "")
-                next
-              end
 
-              base_dir = temp_dir.to_s
-              if base_dir.empty?
-                page.update(status_text, value: "Storage paths error: empty temporary directory")
-                page.update(raw_text, value: "")
-                next
-              end
+          sample_content = "Sample content from file path\n"
+          begin
+            base_dir = File.join(Dir.tmpdir, "ruflet_share_example")
+            FileUtils.mkdir_p(base_dir)
+            sample_path = File.join(base_dir, "sample_from_path.txt")
+            File.write(sample_path, sample_content)
+          rescue StandardError => e
+            page.update(status_text, value: "Path share fallback: #{e.class}: #{e.message}")
+            share_sample_file_from_bytes.call("Sharing a file from path fallback")
+            next
+          end
 
-              FileUtils.mkdir_p(base_dir)
-              sample_path = File.join(base_dir, "sample_from_path.txt")
-              sample_content = "Sample content from file path\n"
-              begin
-                File.write(sample_path, sample_content)
-              rescue StandardError
-                page.update(status_text, value: "Path is not writable from Ruby in this run; using bytes fallback...")
-                page.share_files(
-                  [
-                    {
-                      "data" => sample_content.b,
-                      "mime_type" => "text/plain",
-                      "name" => "sample_from_path.txt"
-                    }
-                  ],
-                  text: "Sharing a file from path fallback",
-                  download_fallback_enabled: true,
-                  mail_to_fallback_enabled: true,
-                  on_result: update_result
-                )
-                next
-              end
-
-              page.update(status_text, value: "Opening share sheet...")
-              page.share_files(
-                [sample_path],
-                text: "Sharing a file from path",
-                download_fallback_enabled: true,
-                mail_to_fallback_enabled: true,
-                on_result: update_result
-              )
-            }
+          page.update(status_text, value: "Opening share sheet...")
+          page.share_files(
+            [sample_path],
+            text: "Sharing a file from path",
+            download_fallback_enabled: true,
+            mail_to_fallback_enabled: true,
+            timeout: 30,
+            on_result: update_result
           )
         end
       )
