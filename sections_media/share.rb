@@ -122,7 +122,7 @@ module RufletStudio
 
               page.update(status_text, value: "Opening share sheet...")
               page.share_files(
-                [{ "path" => sample_path, "name" => "sample_from_path.txt" }],
+                [sample_path],
                 text: "Sharing a file from path",
                 download_fallback_enabled: true,
                 mail_to_fallback_enabled: true,
