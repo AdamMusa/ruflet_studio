@@ -3,7 +3,7 @@
 module RufletStudio
   module SectionsMedia
     def build_camera(page, status)
-      camera = page.service(
+      camera = control(
         :camera,
         preview_enabled: true,
         on_error: ->(e) { page.update(status, value: "Camera error: #{e.data}") }
@@ -15,8 +15,7 @@ module RufletStudio
       last_picture = text(value: "")
 
       preview = container(
-        visible: false,
-        height: 320,
+        height: 1,
         border_radius: 10,
         bgcolor: color_panel(page),
         border: { width: 1, color: color_divider(page) },
@@ -39,7 +38,7 @@ module RufletStudio
           page.invoke(
             camera,
             "get_available_cameras",
-            timeout: 45,
+            timeout: 15,
             on_result: lambda { |result, error|
               if error && !error.to_s.empty?
                 camera_busy = false
@@ -74,7 +73,7 @@ module RufletStudio
                     page.update(status, value: "Camera error: #{init_error}")
                   else
                     initialized = true
-                    page.update(preview, visible: true)
+                    page.update(preview, height: 320)
                     page.update(take_picture_button, disabled: false)
                     page.update(status, value: "Camera initialized.")
                   end
