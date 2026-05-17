@@ -16,10 +16,11 @@ module RufletStudio
             children: [
               button(
                 content: "Pick files",
-                icon: "upload_file",
+                icon: Ruflet::MaterialIcons::UPLOAD_FILE,
                 on_click: ->(_e) do
                   next if picker_in_flight
                   picker_in_flight = true
+                  page.update(selected_files, value: "Opening file picker...")
                   page.pick_files(
                     allow_multiple: true,
                     with_data: false,
@@ -43,10 +44,11 @@ module RufletStudio
             children: [
               button(
                 content: "Save file",
-                icon: "save",
+                icon: Ruflet::MaterialIcons::SAVE,
                 on_click: ->(_e) do
                   next if picker_in_flight
                   picker_in_flight = true
+                  page.update(save_file_path, value: "Opening save dialog...")
                   page.save_file(
                     on_result: lambda { |result, error|
                       picker_in_flight = false
@@ -66,10 +68,11 @@ module RufletStudio
             children: [
               button(
                 content: "Open directory",
-                icon: "folder_open",
+                icon: Ruflet::MaterialIcons::FOLDER_OPEN,
                 on_click: ->(_e) do
                   next if picker_in_flight
                   picker_in_flight = true
+                  page.update(directory_path, value: "Opening directory picker...")
                   page.get_directory_path(
                     on_result: lambda { |result, error|
                       picker_in_flight = false

@@ -28,6 +28,8 @@ module RufletStudio
       share_text_btn = button(
         content: "Share text",
         on_click: ->(_e) do
+          page.update(status_text, value: "Opening share sheet...")
+          page.update(raw_text, value: "")
           page.share_text(
             "Hello from Ruflet!",
             title: "Share greeting",
@@ -42,6 +44,8 @@ module RufletStudio
       share_link_btn = button(
         content: "Share link",
         on_click: ->(_e) do
+          page.update(status_text, value: "Opening share sheet...")
+          page.update(raw_text, value: "")
           page.share_uri(
             "https://ruflet.dev",
             on_result: update_result
@@ -52,6 +56,8 @@ module RufletStudio
       share_bytes_btn = button(
         content: "Share file from bytes",
         on_click: ->(_e) do
+          page.update(status_text, value: "Opening share sheet...")
+          page.update(raw_text, value: "")
           page.share_files(
             [
               {
@@ -71,6 +77,8 @@ module RufletStudio
       share_path_btn = button(
         content: "Share file from path",
         on_click: ->(_e) do
+          page.update(status_text, value: "Preparing file for share...")
+          page.update(raw_text, value: "")
           page.get_temporary_directory(
             on_result: lambda { |temp_dir, temp_error|
               if temp_error && !temp_error.to_s.empty?
@@ -90,6 +98,7 @@ module RufletStudio
               sample_path = File.join(base_dir, "sample_from_path.txt")
               File.write(sample_path, "Sample content from file path\n")
 
+              page.update(status_text, value: "Opening share sheet...")
               page.share_files(
                 [{ "path" => sample_path }],
                 text: "Sharing a file from path",
