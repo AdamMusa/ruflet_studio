@@ -1,70 +1,78 @@
 # frozen_string_literal: true
 
+require "fileutils"
+require "tmpdir"
+
 module RufletStudio
   module SectionsMedia
     def build_storage_paths(page, _status)
       page.service(:storage_paths)
-      rows_column = column(spacing: 5, children: [])
 
-      pretty_value = lambda do |value|
-        return "nil" if value.nil?
-        if value.is_a?(Array)
-          return value.empty? ? "[]" : value.join(", ")
-        end
-        value.to_s
+      status_text = text(value: "Loading temporary path...")
+      path_text = text(value: "", selectable: true)
+      local_text = text(value: "", selectable: true)
+
+      write_local_sample = lambda do
+        local_dir = File.join(Dir.tmpdir, "ruflet_storage_paths_example")
+        FileUtils.mkdir_p(local_dir)
+        local_path = File.join(local_dir, "sample.txt")
+        File.write(local_path, "Hello from Ruflet Studio storage paths\n")
+        local_path
       end
 
-      add_row = lambda do |label, value|
-        rows = Array(rows_column.children)
-        rows << text(value: "#{label}: #{pretty_value.call(value)}")
-        page.update(rows_column, children: rows)
-      end
-
-      fail_row = lambda do |label, error|
-        add_row.call(label, "Not supported: #{error}")
-      end
-
-      fetches = [
-        ["Application cache directory", ->(cb) { page.get_application_cache_directory(on_result: cb) }],
-        ["Application documents directory", ->(cb) { page.get_application_documents_directory(on_result: cb) }],
-        ["Application support directory", ->(cb) { page.get_application_support_directory(on_result: cb) }],
-        ["Downloads directory", ->(cb) { page.get_downloads_directory(on_result: cb) }],
-        ["External cache directories", ->(cb) { page.get_external_cache_directories(on_result: cb) }],
-        ["External storage directories", ->(cb) { page.get_external_storage_directories(on_result: cb) }],
-        ["Library directory", ->(cb) { page.get_library_directory(on_result: cb) }],
-        ["External storage directory", ->(cb) { page.get_external_storage_directory(on_result: cb) }],
-        ["Temporary directory", ->(cb) { page.get_temporary_directory(on_result: cb) }],
-        ["Console log filename", ->(cb) { page.get_console_log_filename(on_result: cb) }]
-      ]
-
-      run_next = nil
-      run_next = lambda do |index|
-        return if index >= fetches.length
-
-        label, runner = fetches[index]
-        runner.call(lambda { |result, error|
+      page.get_temporary_directory(
+        timeout: 10,
+        on_result: lambda { |result, error|
           if error && !error.to_s.empty?
-            fail_row.call(label, error)
-          elsif result.nil? || (result.respond_to?(:empty?) && result.empty?)
-            add_row.call(label, "Not supported on this platform")
-          else
-            add_row.call(label, result)
+            page.update(status_text, value: "Storage paths error: #{error}")
+            next
           end
-          run_next.call(index + 1)
-        })
-      end
 
-      Thread.new do
-        sleep(0.15)
-        run_next.call(0)
-      rescue StandardError => e
-        fail_row.call("Storage paths", e.message)
-      end
+          temporary_directory = result.to_s
+          if temporary_directory.empty?
+            page.update(status_text, value: "Temporary directory is not available on this platform.")
+            next
+          end
+
+          page.update(status_text, value: "Temporary directory")
+          page.update(path_text, value: File.join(temporary_directory, "sample.txt"))
+
+          begin
+            page.update(local_text, value: "Local Ruby sample: #{write_local_sample.call}")
+          rescue StandardError => e
+            page.update(local_text, value: "Local Ruby sample error: #{e.class}: #{e.message}")
+          end
+        }
+      )
+
+      refresh_btn = button(
+        content: "Refresh",
+        on_click: ->(_e) do
+          page.update(status_text, value: "Loading temporary path...")
+          page.update(path_text, value: "")
+          page.get_temporary_directory(
+            timeout: 10,
+            on_result: lambda { |result, error|
+              if error && !error.to_s.empty?
+                page.update(status_text, value: "Storage paths error: #{error}")
+                next
+              end
+
+              temporary_directory = result.to_s
+              page.update(status_text, value: temporary_directory.empty? ? "Temporary directory is not available." : "Temporary directory")
+              page.update(path_text, value: temporary_directory.empty? ? "" : File.join(temporary_directory, "sample.txt"))
+            }
+          )
+        end
+      )
 
       column(
         spacing: 8,
         children: [
-          rows_column
+          status_text,
+          path_text,
+          local_text,
+          refresh_btn
         ]
       )
     end
