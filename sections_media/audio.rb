@@ -10,7 +10,7 @@ module RufletStudio
 
       audio = page.instance_variable_get(:@audio_service)
       unless audio
-        audio = control(
+        audio = page.service(
           :audio,
           src: "https://github.com/flet-dev/media/raw/refs/heads/main/sounds/sweet-life-luxury-chill-438146.mp3",
           autoplay: false,
@@ -49,11 +49,20 @@ module RufletStudio
         page.instance_variable_set(:@audio_service, audio)
       end
 
-      page.add_service(audio) unless page.services.include?(audio)
-
       send_audio = lambda do |label, method_name, args: nil|
         page.update(status, value: "Audio: #{label}")
-        page.invoke(audio, method_name, args: args)
+        page.invoke(
+          audio,
+          method_name,
+          args: args || {},
+          on_result: lambda { |result, error|
+            if error && !error.to_s.empty?
+              page.update(status, value: "Audio error: #{error}")
+            elsif result
+              page.update(status, value: "Audio #{label}: #{result}")
+            end
+          }
+        )
       end
 
       play_btn = button(content: text(value: "Play"), on_click: ->(_e) { send_audio.call("Play", "play") })
