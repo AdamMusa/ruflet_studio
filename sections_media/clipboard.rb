@@ -10,6 +10,7 @@ module RufletStudio
 
       state_text = text(value: "")
       files_column = column(horizontal_alignment: Ruflet::CrossAxisAlignment::CENTER, spacing: 0, children: [])
+      clipboard_in_flight = false
 
       temp_dir = File.join(Dir.tmpdir, "ruflet_clipboard_files_example")
       FileUtils.mkdir_p(temp_dir)
@@ -23,9 +24,15 @@ module RufletStudio
       set_files_btn = button(
         content: "Set example files to clipboard",
         on_click: ->(_e) do
+          next if clipboard_in_flight
+
+          clipboard_in_flight = true
+          page.update(state_text, value: "Setting clipboard files...")
           page.set_clipboard_files(
             sample_files,
+            timeout: 6,
             on_result: lambda { |result, error|
+              clipboard_in_flight = false
               if error && !error.to_s.empty?
                 page.update(state_text, value: "Clipboard error: #{error}")
                 next
@@ -40,8 +47,14 @@ module RufletStudio
       get_files_btn = button(
         content: "Get files from clipboard",
         on_click: ->(_e) do
+          next if clipboard_in_flight
+
+          clipboard_in_flight = true
+          page.update(state_text, value: "Reading clipboard files...")
           page.get_clipboard_files(
+            timeout: 6,
             on_result: lambda { |result, error|
+              clipboard_in_flight = false
               if error && !error.to_s.empty?
                 page.update(state_text, value: "Clipboard error: #{error}")
                 page.update(files_column, children: [])
@@ -66,16 +79,22 @@ module RufletStudio
       get_image_btn = button(
         content: "Get image from clipboard",
         on_click: ->(_e) do
+          next if clipboard_in_flight
+
+          clipboard_in_flight = true
+          page.update(state_text, value: "Reading clipboard image...")
           page.get_clipboard_image(
+            timeout: 6,
             on_result: lambda { |result, error|
+              clipboard_in_flight = false
               if error && !error.to_s.empty?
                 page.update(state_text, value: "Clipboard image error: #{error}")
                 next
               end
-              if result.nil? || result.to_s.empty?
+              size = result.respond_to?(:bytesize) ? result.bytesize : result.to_s.bytesize
+              if result.nil? || size.zero?
                 page.update(state_text, value: "No image in clipboard.")
               else
-                size = result.respond_to?(:bytesize) ? result.bytesize : result.to_s.bytesize
                 page.update(state_text, value: "Clipboard image available (#{size} bytes).")
               end
             }

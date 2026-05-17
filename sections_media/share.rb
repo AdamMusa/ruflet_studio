@@ -99,11 +99,30 @@ module RufletStudio
 
               FileUtils.mkdir_p(base_dir)
               sample_path = File.join(base_dir, "sample_from_path.txt")
-              File.write(sample_path, "Sample content from file path\n")
+              sample_content = "Sample content from file path\n"
+              begin
+                File.write(sample_path, sample_content)
+              rescue StandardError
+                page.update(status_text, value: "Path is not writable from Ruby in this run; using bytes fallback...")
+                page.share_files(
+                  [
+                    {
+                      "data" => sample_content.b,
+                      "mime_type" => "text/plain",
+                      "name" => "sample_from_path.txt"
+                    }
+                  ],
+                  text: "Sharing a file from path fallback",
+                  download_fallback_enabled: true,
+                  mail_to_fallback_enabled: true,
+                  on_result: update_result
+                )
+                next
+              end
 
               page.update(status_text, value: "Opening share sheet...")
               page.share_files(
-                [{ "path" => sample_path }],
+                [{ "path" => sample_path, "name" => "sample_from_path.txt" }],
                 text: "Sharing a file from path",
                 download_fallback_enabled: true,
                 mail_to_fallback_enabled: true,
