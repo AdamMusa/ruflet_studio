@@ -7,7 +7,6 @@ module RufletStudio
 
       refresh_info = lambda do
         page.get_battery_level(
-          timeout: nil,
           on_result: lambda { |level, level_error|
             if level_error && !level_error.to_s.empty?
               page.update(info_text, value: "Battery error: #{level_error}")
@@ -15,15 +14,13 @@ module RufletStudio
             end
 
             page.get_battery_state(
-              timeout: nil,
               on_result: lambda { |state, state_error|
                 if state_error && !state_error.to_s.empty?
                   page.update(info_text, value: "Battery error: #{state_error}")
                   next
                 end
 
-                page.battery_save_mode?(
-                  timeout: nil,
+                page.is_in_battery_save_mode(
                   on_result: lambda { |save_mode, save_error|
                     if save_error && !save_error.to_s.empty?
                       page.update(info_text, value: "Battery error: #{save_error}")

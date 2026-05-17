@@ -29,7 +29,7 @@ module RufletStudio
         content: "Share text",
         on_click: ->(_e) do
           page.share_text(
-            text: "Hello from Ruflet!",
+            "Hello from Ruflet!",
             title: "Share greeting",
             subject: "Greeting",
             download_fallback_enabled: true,
@@ -43,7 +43,7 @@ module RufletStudio
         content: "Share link",
         on_click: ->(_e) do
           page.share_uri(
-            uri: "https://ruflet.dev",
+            "https://ruflet.dev",
             on_result: update_result
           )
         end
@@ -53,14 +53,14 @@ module RufletStudio
         content: "Share file from bytes",
         on_click: ->(_e) do
           page.share_files(
-            text: "Sharing a file from memory",
-            files: [
+            [
               {
                 "data" => "Sample content from memory".bytes,
                 "mime_type" => "text/plain",
                 "name" => "sample.txt"
               }
             ],
+            text: "Sharing a file from memory",
             download_fallback_enabled: true,
             mail_to_fallback_enabled: true,
             on_result: update_result
@@ -91,8 +91,8 @@ module RufletStudio
               File.write(sample_path, "Sample content from file path\n")
 
               page.share_files(
+                [{ "path" => sample_path }],
                 text: "Sharing a file from path",
-                files: [{ "path" => sample_path }],
                 download_fallback_enabled: true,
                 mail_to_fallback_enabled: true,
                 on_result: update_result

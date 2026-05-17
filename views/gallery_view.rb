@@ -52,6 +52,7 @@ module RufletStudio
         tile(page, "music_note", "Audio Player", "/audio"),
         tile(page, "video_library", "Video Player", "/video"),
         tile(page, "battery_6_bar", "Battery", "/battery"),
+        tile(page, "brightness_6", "Screen Brightness", "/screen-brightness"),
         tile(page, "content_paste", "Clipboard", "/clipboard"),
         tile(page, "folder", "Storage Paths", "/storage-paths"),
         tile(page, "share", "Share", "/share"),

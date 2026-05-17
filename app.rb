@@ -88,6 +88,9 @@ module RufletStudio
       when "/battery"
         page.views = [detail_view(page, "Battery", build_battery(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/battery.rb")]
+      when "/screen-brightness"
+        page.views = [detail_view(page, "Screen Brightness", build_screen_brightness(page, status_text(page)),
+                                  source_path: "ruflet_studio/sections_media/screen_brightness.rb")]
       when "/clipboard"
         page.views = [detail_view(page, "Clipboard", build_clipboard(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/clipboard.rb")]

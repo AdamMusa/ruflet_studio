@@ -23,7 +23,6 @@ module RufletStudio
                   page.pick_files(
                     allow_multiple: true,
                     with_data: false,
-                    timeout: nil,
                     on_result: lambda { |result, error|
                       picker_in_flight = false
                       if error && !error.to_s.empty?
@@ -49,7 +48,6 @@ module RufletStudio
                   next if picker_in_flight
                   picker_in_flight = true
                   page.save_file(
-                    timeout: nil,
                     on_result: lambda { |result, error|
                       picker_in_flight = false
                       if error && !error.to_s.empty?
@@ -73,7 +71,6 @@ module RufletStudio
                   next if picker_in_flight
                   picker_in_flight = true
                   page.get_directory_path(
-                    timeout: nil,
                     on_result: lambda { |result, error|
                       picker_in_flight = false
                       if error && !error.to_s.empty?

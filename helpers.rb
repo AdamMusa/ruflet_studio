@@ -28,9 +28,9 @@ module RufletStudio
       url = github_url_for(path)
       return unless url
 
-      url_launcher_service(page)
       page.launch_url(
         url,
+        mode: "external_application",
         on_result: lambda { |_result, error|
           Kernel.warn("GitHub URL launch failed: #{error}") if error && !error.to_s.empty?
         }

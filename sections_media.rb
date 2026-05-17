@@ -12,6 +12,7 @@ require_relative "sections_media/storage_paths"
 require_relative "sections_media/share"
 require_relative "sections_media/webview"
 require_relative "sections_media/battery"
+require_relative "sections_media/screen_brightness"
 
 module RufletStudio
   module SectionsMedia
