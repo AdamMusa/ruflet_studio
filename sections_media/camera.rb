@@ -3,7 +3,7 @@
 module RufletStudio
   module SectionsMedia
     def build_camera(page, status)
-      camera = control(
+      camera = page.service(
         :camera,
         preview_enabled: true,
         on_error: ->(e) { page.update(status, value: "Camera error: #{e.data}") }
