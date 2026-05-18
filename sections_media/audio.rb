@@ -10,8 +10,7 @@ module RufletStudio
 
       audio = page.instance_variable_get(:@audio_service)
       unless audio
-        audio = page.service(
-          :audio,
+        audio = page.audio(
           src: "https://github.com/flet-dev/media/raw/refs/heads/main/sounds/sweet-life-luxury-chill-438146.mp3",
           autoplay: false,
           volume: 1.0,
@@ -19,7 +18,7 @@ module RufletStudio
           release_mode: "stop",
           on_loaded: ->(_e) {
             page.update(status, value: "Audio loaded")
-            page.invoke(audio, "get_duration")
+            audio.get_duration
           },
           on_duration_change: ->(e) {
             payload = e.data.is_a?(Hash) ? e.data : {}
@@ -51,18 +50,29 @@ module RufletStudio
 
       send_audio = lambda do |label, method_name, args: nil|
         page.update(status, value: "Audio: #{label}")
-        page.invoke(
-          audio,
-          method_name,
-          args: args || {},
-          on_result: lambda { |result, error|
-            if error && !error.to_s.empty?
-              page.update(status, value: "Audio error: #{error}")
-            elsif result
-              page.update(status, value: "Audio #{label}: #{result}")
-            end
-          }
-        )
+        callback = lambda { |result, error|
+          if error && !error.to_s.empty?
+            page.update(status, value: "Audio error: #{error}")
+          elsif result
+            page.update(status, value: "Audio #{label}: #{result}")
+          end
+        }
+        case method_name
+        when "play"
+          audio.play(on_result: callback)
+        when "pause"
+          audio.pause(on_result: callback)
+        when "resume"
+          audio.resume(on_result: callback)
+        when "release"
+          audio.release(on_result: callback)
+        when "seek"
+          audio.seek(args && args[:position], on_result: callback)
+        when "get_duration"
+          audio.get_duration(on_result: callback)
+        when "get_current_position"
+          audio.get_current_position(on_result: callback)
+        end
       end
 
       play_btn = button(content: text(value: "Play"), on_click: ->(_e) { send_audio.call("Play", "play") })
