@@ -21,7 +21,7 @@ module RufletStudio
     end
 
     def url_launcher_service(page)
-      page.service(:url_launcher)
+      page.url_launcher
     end
 
     def open_github(page, path)
