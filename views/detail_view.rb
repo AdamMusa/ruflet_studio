@@ -15,7 +15,7 @@ module RufletStudio
           color: color_text(page),
           title: text(value: title, style: { size: 18 }),
           leading: icon_button(
-            icon: "arrow_back",
+            icon: Ruflet::MaterialIcons::ARROW_BACK,
             on_click: ->(_e) { page.go("/gallery") }
           ),
           actions: begin

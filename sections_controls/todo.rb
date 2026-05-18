@@ -36,7 +36,7 @@ module RufletStudio
             children: [
               checkbox_control,
               icon_button(
-                icon: "delete",
+                icon: Ruflet::MaterialIcons::DELETE,
                 tooltip: "Delete",
                 on_click: ->(_e) {
                   todos.delete_at(idx)

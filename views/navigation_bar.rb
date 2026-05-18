@@ -3,9 +3,9 @@
 module RufletStudio
   module Views
     STUDIO_NAV_ITEMS = [
-      ["home", "Home", "/home"],
-      ["grid_view", "Gallery", "/gallery"],
-      ["settings", "Settings", "/settings"]
+      [Ruflet::MaterialIcons::HOME, "Home", "/home"],
+      [Ruflet::MaterialIcons::GRID_VIEW, "Gallery", "/gallery"],
+      [Ruflet::MaterialIcons::SETTINGS, "Settings", "/settings"]
     ].freeze
 
     def nav_bar(page, route)
@@ -16,14 +16,14 @@ module RufletStudio
         padding: { left: 12, right: 12, top: 10, bottom: 12 },
         content: row(
           spacing: 12,
-          children: STUDIO_NAV_ITEMS.each_with_index.map do |(icon_name, label, item_route), index|
-            nav_tab(page, index, selected, icon_name, label, item_route)
+          children: STUDIO_NAV_ITEMS.each_with_index.map do |(icon_value, label, item_route), index|
+            nav_tab(page, index, selected, icon_value, label, item_route)
           end
         )
       )
     end
 
-    def nav_tab(page, index, selected, icon_name, label, route)
+    def nav_tab(page, index, selected, icon_value, label, route)
       active = index == selected
 
       container(
@@ -37,7 +37,7 @@ module RufletStudio
           spacing: 6,
           children: [
             icon(
-              icon: icon_name,
+              icon: icon_value,
               color: active ? color_accent(page) : color_subtle(page)
             ),
             text(

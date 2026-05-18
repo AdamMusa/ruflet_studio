@@ -3,9 +3,9 @@
 module RufletStudio
   module Views
     SETTINGS_THEME_OPTIONS = [
-      ["contrast", "System", "Match device appearance", "system"],
-      ["light_mode", "Light", "Bright surfaces for daytime use", "light"],
-      ["dark_mode", "Dark", "Low-glare surfaces with higher contrast", "dark"]
+      [Ruflet::MaterialIcons::CONTRAST, "System", "Match device appearance", "system"],
+      [Ruflet::MaterialIcons::LIGHT_MODE, "Light", "Bright surfaces for daytime use", "light"],
+      [Ruflet::MaterialIcons::DARK_MODE, "Dark", "Low-glare surfaces with higher contrast", "dark"]
     ].freeze
 
     def settings_view(page)
@@ -43,8 +43,8 @@ module RufletStudio
                       page,
                       column(
                         spacing: 10,
-                        children: SETTINGS_THEME_OPTIONS.map do |icon_name, title, subtitle, value|
-                          theme_option_row(page, icon_name, title, subtitle, value)
+                        children: SETTINGS_THEME_OPTIONS.map do |icon_value, title, subtitle, value|
+                          theme_option_row(page, icon_value, title, subtitle, value)
                         end
                       )
                     ),
@@ -53,7 +53,7 @@ module RufletStudio
                     control(
                       :list_tile,
                       bgcolor: color_surface(page),
-                      leading: icon(icon: "vibration", color: color_icon(page)),
+                      leading: icon(icon: Ruflet::MaterialIcons::VIBRATION, color: color_icon(page)),
                       title: text(value: "Shake device", style: { color: color_text(page) }),
                       trailing: gestures_shake,
                       on_click: ->(_e) {
@@ -64,7 +64,7 @@ module RufletStudio
                     control(
                       :list_tile,
                       bgcolor: color_surface(page),
-                      leading: icon(icon: "pan_tool_alt", color: color_icon(page)),
+                      leading: icon(icon: Ruflet::MaterialIcons::PAN_TOOL_ALT, color: color_icon(page)),
                       title: text(value: "Long press with two fingers", style: { color: color_text(page) }),
                       trailing: gestures_long_press,
                       on_click: ->(_e) {
@@ -111,7 +111,7 @@ module RufletStudio
       )
     end
 
-    def theme_option_row(page, icon_name, title, subtitle, value)
+    def theme_option_row(page, icon_value, title, subtitle, value)
       selected = theme_mode == value
 
       container(
@@ -128,7 +128,7 @@ module RufletStudio
               expand: true,
               spacing: 12,
               children: [
-                icon(icon: icon_name, color: selected ? color_accent(page) : color_icon(page)),
+                icon(icon: icon_value, color: selected ? color_accent(page) : color_icon(page)),
                 column(
                   expand: true,
                   spacing: 2,
@@ -140,7 +140,7 @@ module RufletStudio
               ]
             ),
             icon(
-              icon: selected ? "check_circle" : "radio_button_unchecked",
+              icon: selected ? Ruflet::MaterialIcons::CHECK_CIRCLE : Ruflet::MaterialIcons::RADIO_BUTTON_UNCHECKED,
               color: selected ? color_accent(page) : color_subtle(page)
             )
           ]

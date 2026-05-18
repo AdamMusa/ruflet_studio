@@ -18,7 +18,7 @@ module RufletStudio
         control(
           :banner,
           open: true,
-          leading: icon(icon: "info"),
+          leading: icon(icon: Ruflet::MaterialIcons::INFO),
           content: text(value: "Backup completed successfully."),
           actions: [
             text_button(content: text(value: "Dismiss"), on_click: ->(_e) { page.pop_dialog })
@@ -105,7 +105,7 @@ module RufletStudio
               )
             )
           ),
-          control(:list_tile, leading: icon(icon: "info"), title: text(value: "ListTile"))
+          control(:list_tile, leading: icon(icon: Ruflet::MaterialIcons::INFO), title: text(value: "ListTile"))
         ]
       )
     end

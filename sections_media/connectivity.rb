@@ -20,7 +20,7 @@ module RufletStudio
             children: [
               button(
                 content: "Get connectivity",
-                icon: "wifi",
+                icon: 'wifi',
                 on_click: ->(_e) do
                   page.get_connectivity(
                     on_result: lambda { |result, error|

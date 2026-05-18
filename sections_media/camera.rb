@@ -30,7 +30,7 @@ module RufletStudio
           page.update(open_button, disabled: true)
           page.update(status, value: "Checking available cameras...")
           Thread.new do
-            sleep(8)
+            sleep(2)
             if camera_busy
               page.update(status, value: "Still waiting for the platform camera list...")
             end
@@ -38,7 +38,7 @@ module RufletStudio
           page.invoke(
             camera,
             "get_available_cameras",
-            timeout: 15,
+            timeout: 5,
             on_result: lambda { |result, error|
               if error && !error.to_s.empty?
                 camera_busy = false

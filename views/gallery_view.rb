@@ -38,17 +38,17 @@ module RufletStudio
 
     def gallery_items(page)
       [
-        tile(page, "add", "Counter", "/counter"),
-        tile(page, "check", "To-do", "/todo"),
-        tile(page, "calculate", "Calculator", "/calculator"),
-        tile(page, "brush", "Drawing Tool", "/drawing"),
-        tile(page, "public", "WebView", "/webview"),
-        tile(page, "view_module", "Material controls", "/material"),
-        tile(page, "phone_iphone", "Cupertino controls", "/cupertino"),
-        tile(page, "show_chart", "Charts", "/charts"),
-        tile(page, "grid_on", "Minesweeper", "/minesweeper"),
-        tile(page, "search", "Icon Search", "/icon-search"),
-        tile(page, "animation", "Ruflet Animation", "/animation"),
+        tile(page, Ruflet::MaterialIcons::ADD, "Counter", "/counter"),
+        tile(page, Ruflet::MaterialIcons::CHECK, "To-do", "/todo"),
+        tile(page, Ruflet::MaterialIcons::CALCULATE, "Calculator", "/calculator"),
+        tile(page, Ruflet::MaterialIcons::BRUSH, "Drawing Tool", "/drawing"),
+        tile(page, Ruflet::MaterialIcons::PUBLIC, "WebView", "/webview"),
+        tile(page, Ruflet::MaterialIcons::VIEW_MODULE, "Material controls", "/material"),
+        tile(page, Ruflet::MaterialIcons::PHONE_IPHONE, "Cupertino controls", "/cupertino"),
+        tile(page, Ruflet::MaterialIcons::SHOW_CHART, "Charts", "/charts"),
+        tile(page, Ruflet::MaterialIcons::GRID_ON, "Minesweeper", "/minesweeper"),
+        tile(page, Ruflet::MaterialIcons::SEARCH, "Icon Search", "/icon-search"),
+        tile(page, Ruflet::MaterialIcons::ANIMATION, "Ruflet Animation", "/animation"),
         tile(page, Ruflet::MaterialIcons::SPEED, "Accelerometer", "/accelerometer"),
         tile(page, Ruflet::MaterialIcons::SCREEN_ROTATION, "Gyroscope", "/gyroscope"),
         tile(page, Ruflet::MaterialIcons::DIRECTIONS_RUN, "User Accelerometer", "/user-accelerometer"),
@@ -57,28 +57,28 @@ module RufletStudio
         tile(page, Ruflet::MaterialIcons::VIBRATION, "Shake Detector", "/shake-detector"),
         tile(page, Ruflet::MaterialIcons::ACCESSIBILITY, "Semantics Service", "/semantics-service"),
         tile(page, Ruflet::MaterialIcons::SCREENSHOT, "Screenshot", "/screenshot"),
-        tile(page, "music_note", "Audio Player", "/audio"),
-        tile(page, "video_library", "Video Player", "/video"),
-        tile(page, "battery_6_bar", "Battery", "/battery"),
-        tile(page, "brightness_6", "Screen Brightness", "/screen-brightness"),
-        tile(page, "content_paste", "Clipboard", "/clipboard"),
-        tile(page, "folder", "Storage Paths", "/storage-paths"),
-        tile(page, "share", "Share", "/share"),
-        tile(page, "flash_on", "Flashlight", "/flashlight"),
-        tile(page, "wifi", "Connectivity", "/connectivity"),
-        tile(page, "photo_camera", "Camera", "/camera"),
-        tile(page, "attach_file", "File Picker", "/file-picker")
+        tile(page, Ruflet::MaterialIcons::MUSIC_NOTE, "Audio Player", "/audio"),
+        tile(page, Ruflet::MaterialIcons::VIDEO_LIBRARY, "Video Player", "/video"),
+        tile(page, Ruflet::MaterialIcons::BATTERY_6_BAR, "Battery", "/battery"),
+        tile(page, Ruflet::MaterialIcons::BRIGHTNESS_6, "Screen Brightness", "/screen-brightness"),
+        tile(page, Ruflet::MaterialIcons::CONTENT_PASTE, "Clipboard", "/clipboard"),
+        tile(page, Ruflet::MaterialIcons::FOLDER, "Storage Paths", "/storage-paths"),
+        tile(page, Ruflet::MaterialIcons::SHARE, "Share", "/share"),
+        tile(page, Ruflet::MaterialIcons::FLASH_ON, "Flashlight", "/flashlight"),
+        tile(page, Ruflet::MaterialIcons::WIFI, "Connectivity", "/connectivity"),
+        tile(page, Ruflet::MaterialIcons::PHOTO_CAMERA, "Camera", "/camera"),
+        tile(page, Ruflet::MaterialIcons::ATTACH_FILE, "File Picker", "/file-picker")
       ]
     end
 
-    def tile(page, icon, title, route)
+    def tile(page, icon_value, title, route)
       control(
         :list_tile,
         bgcolor: color_surface(page),
         content_padding: { left: 12, right: 12, top: 8, bottom: 8 },
-        leading: icon(icon: icon, color: color_icon(page)),
+        leading: icon(icon: icon_value, color: color_icon(page)),
         title: text(value: title, style: { size: 16, color: color_text(page) }),
-        trailing: icon(icon: "chevron_right", color: color_subtle(page)),
+        trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: color_subtle(page)),
         on_click: ->(_e) { page.go(route) }
       )
     end
