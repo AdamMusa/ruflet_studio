@@ -88,6 +88,9 @@ module RufletStudio
       when "/user-accelerometer"
         page.views = [detail_view(page, "User Accelerometer", build_user_accelerometer(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/user_accelerometer.rb")]
+      when "/magnetometer"
+        page.views = [detail_view(page, "Magnetometer", build_magnetometer(page, status_text(page)),
+                                  source_path: "ruflet_studio/sections_media/magnetometer.rb")]
       when "/audio"
         page.views = [detail_view(page, "Audio Player", build_audio(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/audio.rb")]
