@@ -55,6 +55,7 @@ module RufletStudio
         tile(page, Ruflet::MaterialIcons::EXPLORE, "Magnetometer", "/magnetometer"),
         tile(page, Ruflet::MaterialIcons::AIR, "Barometer", "/barometer"),
         tile(page, Ruflet::MaterialIcons::VIBRATION, "Shake Detector", "/shake-detector"),
+        tile(page, Ruflet::MaterialIcons::ACCESSIBILITY, "Semantics Service", "/semantics-service"),
         tile(page, "music_note", "Audio Player", "/audio"),
         tile(page, "video_library", "Video Player", "/video"),
         tile(page, "battery_6_bar", "Battery", "/battery"),

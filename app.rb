@@ -97,6 +97,9 @@ module RufletStudio
       when "/shake-detector"
         page.views = [detail_view(page, "Shake Detector", build_shake_detector(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/shake_detector.rb")]
+      when "/semantics-service"
+        page.views = [detail_view(page, "Semantics Service", build_semantics_service(page, status_text(page)),
+                                  source_path: "ruflet_studio/sections_media/semantics_service.rb")]
       when "/audio"
         page.views = [detail_view(page, "Audio Player", build_audio(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/audio.rb")]
