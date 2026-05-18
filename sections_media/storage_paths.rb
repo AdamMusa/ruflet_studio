@@ -6,7 +6,7 @@ require "tmpdir"
 module RufletStudio
   module SectionsMedia
     def build_storage_paths(page, _status)
-      page.service(:storage_paths)
+      page.storage_paths
 
       status_text = text(value: "Loading temporary path...")
       path_text = text(value: "", selectable: true)
