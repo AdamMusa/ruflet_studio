@@ -85,6 +85,9 @@ module RufletStudio
       when "/gyroscope"
         page.views = [detail_view(page, "Gyroscope", build_gyroscope(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/gyroscope.rb")]
+      when "/user-accelerometer"
+        page.views = [detail_view(page, "User Accelerometer", build_user_accelerometer(page, status_text(page)),
+                                  source_path: "ruflet_studio/sections_media/user_accelerometer.rb")]
       when "/audio"
         page.views = [detail_view(page, "Audio Player", build_audio(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/audio.rb")]

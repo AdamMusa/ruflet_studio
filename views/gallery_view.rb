@@ -51,6 +51,7 @@ module RufletStudio
         tile(page, "animation", "Ruflet Animation", "/animation"),
         tile(page, Ruflet::MaterialIcons::SPEED, "Accelerometer", "/accelerometer"),
         tile(page, Ruflet::MaterialIcons::SCREEN_ROTATION, "Gyroscope", "/gyroscope"),
+        tile(page, Ruflet::MaterialIcons::DIRECTIONS_RUN, "User Accelerometer", "/user-accelerometer"),
         tile(page, "music_note", "Audio Player", "/audio"),
         tile(page, "video_library", "Video Player", "/video"),
         tile(page, "battery_6_bar", "Battery", "/battery"),
