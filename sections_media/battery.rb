@@ -42,8 +42,7 @@ module RufletStudio
         )
       end
 
-      battery = page.service(:battery)
-      battery.on(:state_change) { |_e| refresh_info.call }
+      page.battery(on_state_change: ->(_e) { refresh_info.call })
       refresh_info.call
 
       control(
