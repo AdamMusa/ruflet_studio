@@ -4,8 +4,7 @@ module RufletStudio
   module SectionsMedia
     def build_connectivity(page, status)
       current_text = text(value: "")
-      page.service(
-        :connectivity,
+      page.connectivity(
         on_change: lambda { |event|
           values = Array(event&.data).map(&:to_s)
           label = values.empty? ? "none" : values.join(", ")
