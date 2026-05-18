@@ -3,8 +3,7 @@
 module RufletStudio
   module SectionsMedia
     def build_video(page, status)
-      video = control(
-        :video,
+      video = video(
         width: 320,
         height: 180,
         aspect_ratio: 16 / 9.0,
@@ -16,16 +15,31 @@ module RufletStudio
         autoplay: false,
         volume: 100,
         playback_rate: 1.0,
-        on_load: ->(_e) { page.update(status, value: "Video loaded") },
+        on_loaded: ->(_e) { page.update(status, value: "Video loaded") },
         on_enter_fullscreen: ->(_e) { page.update(status, value: "Video fullscreen") },
         on_exit_fullscreen: ->(_e) { page.update(status, value: "Video exit fullscreen") },
-        on_state_change: ->(e) { page.update(status, value: "Video state: #{e.data}") },
+        on_completed: ->(_e) { page.update(status, value: "Video completed") },
         on_error: ->(e) { page.update(status, value: "Video error: #{e.data}") }
       )
 
       send_video = lambda do |label, method_name, args: nil|
         page.update(status, value: "Video: #{label}")
-        page.invoke(video, method_name, args: args)
+        case method_name
+        when "play"
+          video.play
+        when "pause"
+          video.pause
+        when "play_or_pause"
+          video.play_or_pause
+        when "stop"
+          video.stop
+        when "next"
+          video.next
+        when "previous"
+          video.previous
+        when "seek"
+          video.seek(args && args[:position])
+        end
       end
 
       column(
