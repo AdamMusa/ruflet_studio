@@ -91,6 +91,9 @@ module RufletStudio
       when "/magnetometer"
         page.views = [detail_view(page, "Magnetometer", build_magnetometer(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/magnetometer.rb")]
+      when "/barometer"
+        page.views = [detail_view(page, "Barometer", build_barometer(page, status_text(page)),
+                                  source_path: "ruflet_studio/sections_media/barometer.rb")]
       when "/audio"
         page.views = [detail_view(page, "Audio Player", build_audio(page, status_text(page)),
                                   source_path: "ruflet_studio/sections_media/audio.rb")]
