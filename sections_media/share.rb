@@ -6,7 +6,7 @@ require "fileutils"
 module RufletStudio
   module SectionsMedia
     def build_share(page, _status)
-      page.service(:share)
+      page.share
 
       status_text = text(value: "")
       raw_text = text(value: "")
