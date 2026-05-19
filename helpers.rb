@@ -3,7 +3,7 @@
 module RufletStudio
   module Helpers
     def github_repo_base
-      "https://github.com/AdamMusa/Ruflet/blob/main/"
+      "https://github.com/AdamMusa/ruflet_studio/blob/main/"
     end
 
     def github_url_for(path)
@@ -20,15 +20,10 @@ module RufletStudio
       )
     end
 
-    def url_launcher_service(page)
-      page.url_launcher
-    end
-
     def open_github(page, path)
       url = github_url_for(path)
       return unless url
 
-      url_launcher_service(page)
       page.launch_url(
         url,
         mode: "external_application",
