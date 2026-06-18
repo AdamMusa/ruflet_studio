@@ -531,6 +531,10 @@ def studio_go(page, route)
   render(page)
 end
 
+def show_sign_in_dialog(page)
+  studio_go(page, "/apps?signin=1")
+end
+
 def render(page)
   route = path(page)
   route = "/apps" if route.empty? || route == "/"
@@ -542,8 +546,6 @@ def render(page)
     case route
     when "/apps"
       apps_view(page)
-    when "/signin"
-      sign_in_view(page)
     when "/gallery"
       gallery_view(page)
     when %r{\A/gallery/([^/]+)/example/([^/]+)}
@@ -616,7 +618,7 @@ def nav_rail(page, active)
   container(width: 72, bgcolor: BG, content: column(spacing: 10, children: [
     container(height: 62, padding: { top: 10, left: 10, right: 10, bottom: 4 },
       content: container(width: 48, height: 48, border_radius: 14, bgcolor: RAIL_BLUE, alignment: "center",
-        on_click: ->(_e) { studio_go(page, "/signin") }, content: icon(icon: Ruflet::MaterialIcons::ADD, color: "#7dd3fc", size: 24))),
+        on_click: ->(_e) { show_sign_in_dialog(page) }, content: icon(icon: Ruflet::MaterialIcons::ADD, color: "#7dd3fc", size: 24))),
     rail_item(page, "Apps", Ruflet::MaterialIcons::GRID_VIEW, "/apps", active == "apps"),
     rail_item(page, "Gallery", Ruflet::MaterialIcons::IMAGE, "/gallery", active == "gallery")
   ]))
@@ -647,7 +649,7 @@ def bottom_tab(page, label, icon_value, route, selected)
 end
 
 def apps_view(page)
-  body = container(expand: true, alignment: "center", content: column(tight: true, horizontal_alignment: "center", spacing: 22, children: [
+  base = container(expand: true, alignment: "center", content: column(tight: true, horizontal_alignment: "center", spacing: 22, children: [
     column(tight: true, horizontal_alignment: "center", spacing: 2, children: [
       text("Sign in to create apps and access your work, or browse", style: { color: TEXT, size: 16, weight: "w600" }),
       row(tight: true, spacing: 4, alignment: "center", children: [
@@ -656,7 +658,9 @@ def apps_view(page)
       ])
     ]),
     filled_button(
-      on_click: ->(_e) { studio_go(page, "/signin") },
+      width: 136,
+      height: 38,
+      on_click: ->(_e) { show_sign_in_dialog(page) },
       content: row(tight: true, spacing: 8, alignment: "center", children: [
         icon(icon: Ruflet::MaterialIcons[:login]),
         text("Sign in")
@@ -664,23 +668,13 @@ def apps_view(page)
     )
   ]))
 
+  body = page.query["signin"].to_s == "1" ? stack(expand: true, children: [base, sign_in_dialog(page)]) : base
   shell(page, "Apps", "apps", body)
 end
 
-def sign_in_view(page)
-  base = container(expand: true, alignment: "center", content: column(tight: true, horizontal_alignment: "center", spacing: 18, children: [
-    column(tight: true, horizontal_alignment: "center", spacing: 2, children: [
-      text("Sign in to create apps and access your work, or browse", style: { color: TEXT, size: 16 }),
-      row(tight: true, spacing: 4, children: [
-        text("Gallery", style: { color: BLUE, size: 16 }),
-        text("for examples.", style: { color: TEXT, size: 16 })
-      ])
-    ]),
-    filled_button(content: row(spacing: 8, children: [icon(icon: Ruflet::MaterialIcons[:login]), text("Sign in")]))
-  ]))
-
-  modal = container(expand: true, alignment: "center", bgcolor: "#00000099", content: container(width: 550, padding: 36, border_radius: 20, bgcolor: "#2a2d33",
-    content: column(spacing: 18, children: [
+def sign_in_dialog(page)
+  container(expand: true, alignment: "center", bgcolor: "#00000099", content: container(width: 430, height: 360, padding: 28, border_radius: 18, bgcolor: "#2a2d33",
+    content: column(tight: true, spacing: 16, children: [
       text("Sign in to Ruflet Studio", style: { color: TEXT, size: 30, weight: "w700" }),
       text("Sign in to create apps, save versions, and access your work from anywhere.", style: { color: TEXT, size: 17 }),
       text("By signing in to Ruflet Studio, you agree to our Terms of Service and Privacy Policy.", style: { color: MUTED, size: 14 }),
@@ -688,13 +682,10 @@ def sign_in_view(page)
       sign_button("Sign in with Google", Ruflet::MaterialIcons[:g_mobiledata]),
       sign_button("Sign in with Microsoft", Ruflet::MaterialIcons::GRID_VIEW)
     ])))
-
-  body = stack(expand: true, children: [base, modal])
-  shell(page, "Apps", "apps", body)
 end
 
 def sign_button(label, icon_value)
-  outlined_button(content: row(alignment: "center", spacing: 10, children: [
+  outlined_button(width: 374, height: 40, content: row(tight: true, alignment: "center", spacing: 10, children: [
     icon(icon: icon_value, color: TEXT),
     text(label, style: { color: TEXT, size: 16, weight: "w600" })
   ]))
