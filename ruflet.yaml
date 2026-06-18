@@ -1,17 +1,20 @@
 app:
-  name: ruflet stuido
-  display_name: Suflet Stuido
-  package_name: ruflet_stuido
-  organization: com.example
+  name: ruflet_studio
+  display_name: Ruflet Studio
+  package_name: ruflet_studio
+  organization: com.ruflet_studio
   version: 1.0.0+1
-  description: A new Ruflet app.
+  description: Ruflet Studio, a Ruflet-native equivalent of Flet Studio.
   # Required for server-driven builds: `ruflet build ios`, `apk`, `web`, etc. without `--self`.
   # Example: https://api.example.com
   backend_url: ""
 
-# Source of truth for Flutter client extensions/plugins.
-# Examples: camera, video, audio, flashlight, webview, map
-services: []
+# Flutter extension packages included in the managed client.
+# Permission-backed extensions such as camera, audio_recorder,
+# geolocator, and permission_handler are activated by services.yaml
+# and ignored here.
+extensions:
+  - code_editor
 
 # Build assets configuration consumed by `ruflet build`.
 # Paths are relative to this file unless absolute.

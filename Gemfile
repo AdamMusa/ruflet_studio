@@ -1,7 +1,5 @@
 source "https://rubygems.org"
 
-ruflet_repo = "/Users/macbookpro/Documents/Izeesoft/FlutterApp/ruflet"
-
-gem "ruflet_core", path: File.join(ruflet_repo, "packages/ruflet_core")
-gem "ruflet_server", path: File.join(ruflet_repo, "packages/ruflet_server")
-gem "ruflet", path: File.join(ruflet_repo, "packages/ruflet")
+gem "ruflet", path: "/Users/macbookpro/Documents/Izeesoft/FlutterApp/ruflet/packages/ruflet"
+gem "ruflet_core", path: "/Users/macbookpro/Documents/Izeesoft/FlutterApp/ruflet/packages/ruflet_core"
+gem "ruflet_server", path: "/Users/macbookpro/Documents/Izeesoft/FlutterApp/ruflet/packages/ruflet_server"
