@@ -673,8 +673,8 @@ def apps_view(page)
 end
 
 def sign_in_dialog(page)
-  container(expand: true, alignment: "center", bgcolor: "#00000099", content: container(width: 430, height: 360, padding: 28, border_radius: 18, bgcolor: "#2a2d33",
-    content: column(tight: true, spacing: 16, children: [
+  container(expand: true, alignment: "center", padding: 16, bgcolor: "#00000099", content: container(width: 430, height: 450, padding: 24, border_radius: 18, bgcolor: "#2a2d33",
+    content: column(tight: true, spacing: 14, children: [
       row(alignment: "center", children: [
         container(expand: true, content: text("Sign in to Ruflet Studio", style: { color: TEXT, size: 30, weight: "w700" })),
         icon_button(icon: Ruflet::MaterialIcons::CLOSE, icon_color: MUTED, on_click: ->(_e) { studio_go(page, "/apps") })
@@ -903,7 +903,7 @@ def mobile_editor_workspace(page, item)
     case tab
     when "files" then mobile_file_list(page, item)
     when "code"  then code_pane(page, item)
-    else container(expand: true, bgcolor: PREVIEW_BG, padding: 14, content: preview_for(page, item[:slug], large: true))
+    else mobile_preview_pane(page, item)
     end
 
   column(expand: true, spacing: 0, children: [
@@ -915,6 +915,12 @@ def mobile_editor_workspace(page, item)
     container(expand: true, content: body),
     console_bar
   ])
+end
+
+def mobile_preview_pane(page, item)
+  container(expand: true, bgcolor: PREVIEW_BG, padding: 14,
+    content: column(expand: true, scroll: "auto", horizontal_alignment: "center",
+      children: [preview_for(page, item[:slug], large: true)]))
 end
 
 def mobile_workspace_tab(page, label, icon_value, tab_key, selected)
@@ -973,15 +979,17 @@ def file_pane(page, item)
 end
 
 def code_pane(page, item)
-  status = text("Read-only preview. Fork it to make changes.", style: { color: MUTED, size: 14 })
+  compact = mobile?(page)
+  status = text(compact ? "Read-only preview" : "Read-only preview. Fork it to make changes.",
+    style: { color: MUTED, size: compact ? 12 : 14 }, max_lines: 1)
   editor = code_editor(selected_code(page, item), language: "ruby", code_theme: "atom-one-dark", read_only: true, expand: true)
   container(expand: true, bgcolor: EDITOR_BG, content: column(expand: true, spacing: 0, children: [
-    container(height: 66, bgcolor: "#2a2d33", padding: { left: 20, right: 18 },
+    container(height: compact ? 52 : 66, bgcolor: "#2a2d33", padding: { left: compact ? 12 : 20, right: compact ? 12 : 18 },
       content: row(spacing: 10, children: [
         icon(icon: Ruflet::MaterialIcons[:lock], color: MUTED, size: 20),
         status,
         container(expand: true, content: text("")),
-        outlined_button(content: row(spacing: 8, children: [icon(icon: Ruflet::MaterialIcons[:fork_right]), text("Fork")]), disabled: true)
+        *(compact ? [] : [outlined_button(content: row(spacing: 8, children: [icon(icon: Ruflet::MaterialIcons[:fork_right]), text("Fork")]), disabled: true)])
       ])),
     container(expand: true, content: editor)
   ]))
@@ -1063,7 +1071,7 @@ def showcase_preview(page, item, large:)
     height: large ? nil : 132,
     padding: large ? 0 : 8,
     clip_behavior: "hardEdge",
-    content: content
+    content: large ? content : column(height: 116, scroll: "hidden", children: [content])
   )
 rescue StandardError => e
   container(width: large ? 420 : 260, padding: 16, border_radius: 8, bgcolor: "#ffffff",
