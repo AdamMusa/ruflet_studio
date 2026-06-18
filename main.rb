@@ -691,29 +691,45 @@ def sign_button(label, icon_value)
   ]))
 end
 
-def gallery_view(page)
-  categories = column(expand: true, scroll: "auto", spacing: 0, children: [
+# The category menu is a wide-screen convenience; below this it is hidden so the
+# gallery grid gets the full width (the grid shows every example anyway).
+def show_categories_menu?(page) = page.width.to_f >= 1000
+
+def categories_menu(page)
+  column(expand: true, scroll: "auto", spacing: 0, children: [
     container(padding: { left: 12, right: 12, top: 12, bottom: 10 },
       content: text_field(label: "Search...", prefix_icon: Ruflet::MaterialIcons::SEARCH, expand: true, height: 46)),
     *CATEGORIES.map { |label, desc, icon_value, slug| category_tile(page, label, icon_value, slug) }
   ])
+end
 
+# Cards reflow with responsive_row: 1 per row on phones (col 12), 2 on tablets
+# (col 6) and 3 on desktops (col 4).
+def gallery_grid(page)
+  cards = showcase_gallery_examples.map do |item|
+    container(col: { "xs" => 12, "sm" => 6, "lg" => 4 }, content: gallery_card(page, item))
+  end
+  container(
+    expand: true,
+    padding: 20,
+    content: column(
+      expand: true,
+      scroll: "auto",
+      children: [responsive_row(columns: 12, spacing: 20, run_spacing: 20, children: cards)]
+    )
+  )
+end
+
+def gallery_view(page)
   body =
-    if mobile?(page)
-      categories
-    else
+    if show_categories_menu?(page)
       row(expand: true, spacing: 0, children: [
-        container(width: 220, content: categories),
+        container(width: 220, content: categories_menu(page)),
         container(width: 1, bgcolor: BORDER),
-        container(expand: true, padding: 24, content: grid_view(
-          expand: true,
-          max_extent: 420,
-          child_aspect_ratio: 1.04,
-          spacing: 24,
-          run_spacing: 24,
-          children: showcase_gallery_examples.map { |item| gallery_card(page, item) }
-        ))
+        gallery_grid(page)
       ])
+    else
+      gallery_grid(page)
     end
   shell(page, "Gallery", "gallery", body)
 end
