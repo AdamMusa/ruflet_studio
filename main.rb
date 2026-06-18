@@ -564,10 +564,7 @@ def render(page)
 end
 
 def logo_mark
-  row(spacing: 0, children: [
-    icon(icon: Ruflet::MaterialIcons[:play_arrow], color: PINK, size: 28),
-    icon(icon: Ruflet::MaterialIcons[:play_arrow], color: BLUE, size: 22)
-  ])
+  image(src: "assets/icon.png", width: 28, height: 28)
 end
 
 def top_bar(page, title, back: nil, actions: [])
@@ -575,7 +572,10 @@ def top_bar(page, title, back: nil, actions: [])
     if back
       text(title, style: { size: 20, weight: "w700", color: TEXT })
     else
-      row(spacing: 10, children: [logo_mark, text(title, style: { size: 20, weight: "w700", color: TEXT })])
+      row(spacing: 10, vertical_alignment: "center", children: [
+        logo_mark,
+        text(title, style: { size: 20, weight: "w700", color: TEXT })
+      ])
     end
 
   app_bar(
