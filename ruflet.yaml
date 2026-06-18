@@ -14,7 +14,15 @@ app:
 # geolocator, and permission_handler are activated by services.yaml
 # and ignored here.
 extensions:
+  - audio
+  - charts
   - code_editor
+  - flashlight
+  - map
+  - rive
+  - secure_storage
+  - video
+  - webview
 
 # Build assets configuration consumed by `ruflet build`.
 # Paths are relative to this file unless absolute.

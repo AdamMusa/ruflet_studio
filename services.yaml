@@ -1,2 +1,10 @@
-# Protected device access requested by this app.
-services: []
+# Protected device access requested by Ruflet Studio showcase apps.
+services:
+  - camera:
+      description: Allows Ruflet Studio examples to capture images and scan QR codes.
+  - microphone:
+      description: Allows Ruflet Studio examples to record audio.
+  - location:
+      description: Allows Ruflet Studio examples to read the device location.
+  - motion:
+      description: Allows Ruflet Studio examples to read motion and barometer sensors.
