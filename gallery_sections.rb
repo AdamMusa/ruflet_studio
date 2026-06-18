@@ -2594,8 +2594,9 @@ module Showcase
 
     def build_rive(page, status)
       # The flet_rive extension has no web renderer, so the web client reports
-      # "Unknown control: Rive". Show a clean notice there instead.
-      if page.web
+      # "Unknown control: Rive". Show a clean notice there instead. RUFLET_TARGET
+      # (set by `ruflet run --web`) is the reliable signal; page.web is a fallback.
+      if ENV["RUFLET_TARGET"] == "web" || page.web
         return container(
           padding: 16,
           border_radius: 12,
@@ -2647,6 +2648,8 @@ module Showcase
               ),
               row(
                 spacing: 8,
+                wrap: true,
+                run_spacing: 8,
                 children: %w[contain cover fill fit_width fit_height none].map do |fit_value|
                   button(
                     content: text(value: fit_value),

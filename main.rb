@@ -698,10 +698,30 @@ end
 # gallery grid gets the full width (the grid shows every example anyway).
 def show_categories_menu?(page) = page.width.to_f >= 760
 
+# Search box: submit (Enter) filters the gallery grid by the typed query.
+def search_field(page)
+  text_field(
+    label: "Search...",
+    prefix_icon: Ruflet::MaterialIcons::SEARCH,
+    value: page.query["q"],
+    expand: true,
+    height: 46,
+    on_submit: ->(e) { studio_go(page, search_route(page, e.data)) }
+  )
+end
+
+def search_route(page, query)
+  q = query.to_s.strip
+  base = show_categories_menu?(page) ? "/gallery" : "/gallery?view=grid"
+  return base if q.empty?
+
+  separator = base.include?("?") ? "&" : "?"
+  "#{base}#{separator}q=#{CGI.escape(q)}"
+end
+
 def categories_menu(page)
   column(expand: true, scroll: "auto", spacing: 0, children: [
-    container(padding: { left: 12, right: 12, top: 12, bottom: 10 },
-      content: text_field(label: "Search...", prefix_icon: Ruflet::MaterialIcons::SEARCH, expand: true, height: 46)),
+    container(padding: { left: 12, right: 12, top: 12, bottom: 10 }, content: search_field(page)),
     *CATEGORIES.map { |label, desc, icon_value, slug| category_tile(page, label, icon_value, slug) }
   ])
 end
@@ -709,16 +729,31 @@ end
 # Cards reflow with responsive_row: 1 per row on phones (col 12), 2 on tablets
 # (col 6) and 3 on desktops (col 4).
 def gallery_grid(page)
-  cards = showcase_gallery_examples.map do |item|
-    container(col: { "xs" => 12, "sm" => 6, "lg" => 4 }, content: gallery_card(page, item))
+  query = page.query["q"].to_s.strip
+  examples = showcase_gallery_examples
+  unless query.empty?
+    needle = query.downcase
+    examples = examples.select { |it| "#{it[:title]} #{it[:description]}".downcase.include?(needle) }
   end
+
+  inner =
+    if examples.empty?
+      container(expand: true, alignment: "center", padding: 40,
+        content: text("No examples match \"#{query}\".", style: { color: MUTED, size: 16 }))
+    else
+      responsive_row(
+        columns: 12, spacing: 20, run_spacing: 20,
+        children: examples.map { |item| container(col: { "xs" => 12, "sm" => 6, "lg" => 4 }, content: gallery_card(page, item)) }
+      )
+    end
+
   container(
     expand: true,
     padding: 20,
     content: column(
       expand: true,
       scroll: "auto",
-      children: [responsive_row(columns: 12, spacing: 20, run_spacing: 20, children: cards)]
+      children: [inner]
     )
   )
 end
@@ -738,8 +773,7 @@ end
 # Small screens default to the category list with the Gallery entry on top.
 def mobile_gallery_menu(page)
   column(expand: true, scroll: "auto", spacing: 0, children: [
-    container(padding: { left: 12, right: 12, top: 12, bottom: 10 },
-      content: text_field(label: "Search...", prefix_icon: Ruflet::MaterialIcons::SEARCH, expand: true, height: 46)),
+    container(padding: { left: 12, right: 12, top: 12, bottom: 10 }, content: search_field(page)),
     gallery_browse_tile(page),
     container(height: 1, bgcolor: BORDER),
     *CATEGORIES.map { |label, _desc, icon_value, slug| category_tile(page, label, icon_value, slug) }
@@ -819,12 +853,21 @@ def example_row(page, item, slug)
 end
 
 def editor_view(page, item, back_route:)
-  actions = [
-    text_button(content: row(spacing: 6, children: [icon(icon: Ruflet::MaterialIcons[:fork_right], color: TEXT), text("Fork", style: { color: TEXT })])),
-    text_button(content: row(spacing: 6, children: [icon(icon: Ruflet::MaterialIcons[:ios_share], color: TEXT), text("Share", style: { color: TEXT })])),
-    icon_button(icon: Ruflet::MaterialIcons[:open_in_new]),
-    icon_button(icon: Ruflet::MaterialIcons[:download])
-  ]
+  actions =
+    if page.width.to_f >= 760
+      [
+        text_button(content: row(spacing: 6, children: [icon(icon: Ruflet::MaterialIcons[:fork_right], color: TEXT), text("Fork", style: { color: TEXT })])),
+        text_button(content: row(spacing: 6, children: [icon(icon: Ruflet::MaterialIcons[:ios_share], color: TEXT), text("Share", style: { color: TEXT })])),
+        icon_button(icon: Ruflet::MaterialIcons[:open_in_new]),
+        icon_button(icon: Ruflet::MaterialIcons[:download])
+      ]
+    else
+      # Compact icon-only actions on phones so the app bar doesn't overflow.
+      [
+        icon_button(icon: Ruflet::MaterialIcons[:fork_right]),
+        icon_button(icon: Ruflet::MaterialIcons[:download])
+      ]
+    end
 
   # The 3-pane (files + code + preview) layout; on phones fall back to the
   # compact tabbed workspace.

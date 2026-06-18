@@ -10,8 +10,8 @@ Ruflet.run do |page|
   page.bgcolor = "#ffffff"
 
   # The web client has no Rive renderer; show a notice there instead of a
-  # broken "Unknown control: Rive" box.
-  if page.web
+  # broken "Unknown control: Rive" box. RUFLET_TARGET is set by `ruflet run --web`.
+  if ENV["RUFLET_TARGET"] == "web" || page.web
     page.add(
       container(
         expand: true,
@@ -69,6 +69,8 @@ Ruflet.run do |page|
               ),
               row(
                 spacing: 8,
+                wrap: true,
+                run_spacing: 8,
                 children: %w[contain cover fill fit_width fit_height none].map do |fit_value|
                   button(
                     content: text(value: fit_value),
