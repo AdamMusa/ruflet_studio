@@ -2593,6 +2593,20 @@ module Showcase
     RIVE_SAMPLE_SRC = "https://cdn.rive.app/animations/vehicles.riv"
 
     def build_rive(page, status)
+      # The flet_rive extension has no web renderer, so the web client reports
+      # "Unknown control: Rive". Show a clean notice there instead.
+      if page.web
+        return container(
+          padding: 16,
+          border_radius: 12,
+          bgcolor: color_panel(page),
+          content: column(spacing: 6, children: [
+            text(value: "Rive", style: { size: 15, weight: "w600" }),
+            text(value: "Rive animations run in the desktop and mobile clients — the web client can't render them yet.",
+                 style: { size: 13, color: color_subtle(page) })
+          ])
+        )
+      end
       return unsupported_feature_panel(page, "Rive", "rive") unless feature_supported?(page, "rive")
 
       animation = rive(

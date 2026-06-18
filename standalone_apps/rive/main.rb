@@ -8,6 +8,25 @@ Ruflet.run do |page|
   page.title = "Rive"
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"
+
+  # The web client has no Rive renderer; show a notice there instead of a
+  # broken "Unknown control: Rive" box.
+  if page.web
+    page.add(
+      container(
+        expand: true,
+        alignment: "center",
+        padding: 24,
+        content: column(tight: true, horizontal_alignment: "center", spacing: 8, children: [
+          text(value: "Rive", style: { size: 18, weight: "w700" }),
+          text(value: "Rive animations run in the desktop and mobile clients.\nThe web client can't render them yet.",
+               text_align: "center", style: { size: 13, color: "#6b7280" })
+        ])
+      )
+    )
+    next
+  end
+
   status = text(value: "", style: { size: 12, color: "#6b7280" })
   animation = rive(
     RIVE_SAMPLE_SRC,

@@ -617,8 +617,8 @@ end
 def nav_rail(page, active)
   container(width: 72, bgcolor: BG, content: column(spacing: 10, children: [
     container(height: 62, padding: { top: 10, left: 10, right: 10, bottom: 4 },
-      content: container(width: 48, height: 48, border_radius: 14, bgcolor: RAIL_BLUE, alignment: "center",
-        on_click: ->(_e) { show_sign_in_dialog(page) }, content: icon(icon: Ruflet::MaterialIcons::ADD, color: "#7dd3fc", size: 24))),
+      content: container(width: 48, height: 48, border_radius: 14, bgcolor: SURFACE_2, alignment: "center",
+        on_click: ->(_e) { show_sign_in_dialog(page) }, content: icon(icon: Ruflet::MaterialIcons::ADD, color: TEXT, size: 24))),
     rail_item(page, "Apps", Ruflet::MaterialIcons::GRID_VIEW, "/apps", active == "apps"),
     rail_item(page, "Gallery", Ruflet::MaterialIcons::IMAGE, "/gallery", active == "gallery")
   ]))
@@ -627,8 +627,8 @@ end
 def rail_item(page, label, icon_value, route, selected)
   container(padding: { left: 6, right: 6 }, content: column(horizontal_alignment: "center", spacing: 3, children: [
     container(width: 46, height: 36, border_radius: 18, bgcolor: selected ? PINK : BG, alignment: "center",
-      on_click: ->(_e) { studio_go(page, route) }, content: icon(icon: icon_value, color: selected ? "#ffffff" : TEXT, size: 22)),
-    text(label, style: { color: TEXT, size: 12, weight: "w600" })
+      on_click: ->(_e) { studio_go(page, route) }, content: icon(icon: icon_value, color: selected ? "#ffffff" : MUTED, size: 22)),
+    text(label, style: { color: selected ? TEXT : MUTED, size: 12, weight: selected ? "w700" : "w600" })
   ]))
 end
 
@@ -675,7 +675,10 @@ end
 def sign_in_dialog(page)
   container(expand: true, alignment: "center", bgcolor: "#00000099", content: container(width: 430, height: 360, padding: 28, border_radius: 18, bgcolor: "#2a2d33",
     content: column(tight: true, spacing: 16, children: [
-      text("Sign in to Ruflet Studio", style: { color: TEXT, size: 30, weight: "w700" }),
+      row(alignment: "center", children: [
+        container(expand: true, content: text("Sign in to Ruflet Studio", style: { color: TEXT, size: 30, weight: "w700" })),
+        icon_button(icon: Ruflet::MaterialIcons::CLOSE, icon_color: MUTED, on_click: ->(_e) { studio_go(page, "/apps") })
+      ]),
       text("Sign in to create apps, save versions, and access your work from anywhere.", style: { color: TEXT, size: 17 }),
       text("By signing in to Ruflet Studio, you agree to our Terms of Service and Privacy Policy.", style: { color: MUTED, size: 14 }),
       sign_button("Sign in with GitHub", Ruflet::MaterialIcons[:code]),
@@ -693,7 +696,7 @@ end
 
 # The category menu is a wide-screen convenience; below this it is hidden so the
 # gallery grid gets the full width (the grid shows every example anyway).
-def show_categories_menu?(page) = page.width.to_f >= 1000
+def show_categories_menu?(page) = page.width.to_f >= 760
 
 def categories_menu(page)
   column(expand: true, scroll: "auto", spacing: 0, children: [
@@ -720,26 +723,66 @@ def gallery_grid(page)
   )
 end
 
+# Small-screen-only "Gallery" entry at the top of the category list; tapping it
+# opens the full card grid (which the desktop layout shows permanently).
+def gallery_browse_tile(page)
+  container(height: 56, content: list_tile(
+    content_padding: { left: 12, right: 8, top: 0, bottom: 0 },
+    leading: icon(icon: Ruflet::MaterialIcons::IMAGE, color: PINK, size: 20),
+    title: text("Gallery", style: { color: TEXT, size: 15, weight: "w700" }),
+    subtitle: text("Browse all examples", style: { color: MUTED, size: 12 }),
+    trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: TEXT, size: 20),
+    on_click: ->(_e) { studio_go(page, "/gallery?view=grid") }))
+end
+
+# Small screens default to the category list with the Gallery entry on top.
+def mobile_gallery_menu(page)
+  column(expand: true, scroll: "auto", spacing: 0, children: [
+    container(padding: { left: 12, right: 12, top: 12, bottom: 10 },
+      content: text_field(label: "Search...", prefix_icon: Ruflet::MaterialIcons::SEARCH, expand: true, height: 46)),
+    gallery_browse_tile(page),
+    container(height: 1, bgcolor: BORDER),
+    *CATEGORIES.map { |label, _desc, icon_value, slug| category_tile(page, label, icon_value, slug) }
+  ])
+end
+
+def gallery_back_bar(page, title)
+  container(height: 48, bgcolor: BG, padding: { left: 4, right: 12 },
+    content: row(alignment: "center", spacing: 2, children: [
+      icon_button(icon: Ruflet::MaterialIcons::ARROW_BACK, on_click: ->(_e) { studio_go(page, "/gallery") }),
+      text(title, style: { color: TEXT, size: 16, weight: "w700" })
+    ]))
+end
+
 def gallery_view(page)
   body =
     if show_categories_menu?(page)
+      # Desktop: category list + card grid side by side.
       row(expand: true, spacing: 0, children: [
-        container(width: 220, content: categories_menu(page)),
+        container(width: 300, content: categories_menu(page)),
         container(width: 1, bgcolor: BORDER),
         gallery_grid(page)
       ])
+    elsif page.query["view"] == "grid"
+      # Small screen: the card grid, reached from the "Gallery" list entry.
+      column(expand: true, spacing: 0, children: [
+        gallery_back_bar(page, "Gallery"),
+        container(height: 1, bgcolor: BORDER),
+        gallery_grid(page)
+      ])
     else
-      gallery_grid(page)
+      # Small screen default: the category list.
+      mobile_gallery_menu(page)
     end
   shell(page, "Gallery", "gallery", body)
 end
 
 def category_tile(page, label, icon_value, slug)
-  container(height: 52, content: list_tile(
-    content_padding: { left: 12, right: 8, top: 0, bottom: 0 },
-    leading: icon(icon: icon_value, color: TEXT, size: 20),
-    title: text(label, style: { color: TEXT, size: 15, weight: "w700" }),
-    trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: TEXT, size: 20),
+  container(height: 60, content: list_tile(
+    content_padding: { left: 16, right: 12, top: 0, bottom: 0 },
+    leading: icon(icon: icon_value, color: TEXT, size: 22),
+    title: text(label, style: { color: TEXT, size: 17, weight: "w700" }),
+    trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: TEXT, size: 22),
     on_click: ->(_e) { studio_go(page, "/gallery/#{slug}") }))
 end
 
@@ -783,11 +826,13 @@ def editor_view(page, item, back_route:)
     icon_button(icon: Ruflet::MaterialIcons[:download])
   ]
 
+  # The 3-pane (files + code + preview) layout; on phones fall back to the
+  # compact tabbed workspace.
   workspace =
-    if mobile?(page)
-      mobile_editor_workspace(page, item)
-    else
+    if page.width.to_f >= 760
       desktop_editor_workspace(page, item)
+    else
+      mobile_editor_workspace(page, item)
     end
 
   control(:view, route: path(page), bgcolor: BG, padding: 0,
@@ -805,30 +850,68 @@ def desktop_editor_workspace(page, item)
   ])
 end
 
+# Compact editor for narrow screens: the Files / Code / Preview tabs switch the
+# visible pane via a ?tab= param (instead of cramming all three side by side).
 def mobile_editor_workspace(page, item)
+  tab = page.query["tab"].to_s
+  tab = "preview" unless %w[files code preview].include?(tab)
+
+  body =
+    case tab
+    when "files" then mobile_file_list(page, item)
+    when "code"  then code_pane(page, item)
+    else container(expand: true, bgcolor: PREVIEW_BG, padding: 14, content: preview_for(page, item[:slug], large: true))
+    end
+
   column(expand: true, spacing: 0, children: [
-    container(height: 48, bgcolor: BG, content: row(spacing: 0, children: [
-      mobile_workspace_tab("Files", Ruflet::MaterialIcons::FOLDER, false),
-      mobile_workspace_tab("Code", Ruflet::MaterialIcons::CODE, false),
-      mobile_workspace_tab("Preview", Ruflet::MaterialIcons[:play_circle_outline], true)
+    container(height: 48, bgcolor: BAR, content: row(spacing: 0, children: [
+      mobile_workspace_tab(page, "Files", Ruflet::MaterialIcons::FOLDER, "files", tab == "files"),
+      mobile_workspace_tab(page, "Code", Ruflet::MaterialIcons::CODE, "code", tab == "code"),
+      mobile_workspace_tab(page, "Preview", Ruflet::MaterialIcons[:play_circle_outline], "preview", tab == "preview")
     ])),
-    container(expand: true, bgcolor: PREVIEW_BG, padding: 14, content: preview_for(page, item[:slug], large: true)),
+    container(expand: true, content: body),
     console_bar
   ])
 end
 
-def mobile_workspace_tab(label, icon_value, selected)
-  container(expand: true, alignment: "center", bgcolor: BG, border: selected ? { width: 0, color: BLUE } : nil,
+def mobile_workspace_tab(page, label, icon_value, tab_key, selected)
+  container(expand: true, alignment: "center", bgcolor: selected ? BG : BAR,
+    on_click: ->(_e) { studio_go(page, tab_route(page, tab_key)) },
     content: row(alignment: "center", spacing: 6, children: [
       icon(icon: icon_value, color: selected ? BLUE : MUTED, size: 18),
-      text(label, style: { color: selected ? BLUE : MUTED, size: 14 })
+      text(label, style: { color: selected ? BLUE : MUTED, size: 14, weight: selected ? "w700" : "w600" })
     ]))
+end
+
+def mobile_file_list(page, item)
+  current = selected_file(page, item)
+  container(expand: true, bgcolor: BG, padding: 12, content: column(expand: true, scroll: "auto", spacing: 6, children:
+    item_files(item).keys.map do |file|
+      sel = file == current
+      container(border_radius: 8, bgcolor: sel ? SURFACE_2 : BG, padding: 12,
+        on_click: ->(_e) { studio_go(page, tab_route(page, "code", file: file)) },
+        content: row(spacing: 10, children: [
+          icon(icon: Ruflet::MaterialIcons[:insert_drive_file], color: sel ? BLUE : MUTED),
+          text(file, style: { color: TEXT, size: 16, weight: sel ? "w700" : "w500" })
+        ]))
+    end))
+end
+
+# Route to a workspace tab, preserving the selected file and the back origin.
+def tab_route(page, tab, file: nil)
+  base = path(page)
+  selected = file || page.query["file"]
+  origin = page.query["from"]
+  params = { "tab" => tab }
+  params["file"] = selected unless selected.to_s.empty?
+  params["from"] = origin unless origin.to_s.empty?
+  "#{base}?" + params.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
 end
 
 def file_pane(page, item)
   current_file = selected_file(page, item)
   files = item_files(item)
-  container(width: 330, bgcolor: BG, padding: 12, content: column(expand: true, spacing: 8, children: [
+  container(width: 250, bgcolor: BG, padding: 12, content: column(expand: true, spacing: 8, children: [
     row(children: [
       text("Files", style: { color: TEXT, size: 14, weight: "w700" }),
       container(expand: true, content: text("")),
@@ -840,7 +923,7 @@ def file_pane(page, item)
         on_click: ->(_e) { studio_go(page, file_route(page, file)) },
         content: row(spacing: 8, children: [
           icon(icon: Ruflet::MaterialIcons[:insert_drive_file], color: MUTED),
-          text(file, style: { color: TEXT, size: 18, weight: selected ? "w700" : "w500" })
+          text(file, style: { color: TEXT, size: 15, weight: selected ? "w700" : "w500" })
         ]))
     end
   ]))
@@ -849,7 +932,7 @@ end
 def code_pane(page, item)
   status = text("Read-only preview. Fork it to make changes.", style: { color: MUTED, size: 14 })
   editor = code_editor(selected_code(page, item), language: "ruby", code_theme: "atom-one-dark", read_only: true, expand: true)
-  container(width: 780, bgcolor: EDITOR_BG, content: column(expand: true, spacing: 0, children: [
+  container(expand: true, bgcolor: EDITOR_BG, content: column(expand: true, spacing: 0, children: [
     container(height: 66, bgcolor: "#2a2d33", padding: { left: 20, right: 18 },
       content: row(spacing: 10, children: [
         icon(icon: Ruflet::MaterialIcons[:lock], color: MUTED, size: 20),
