@@ -1118,7 +1118,7 @@ end
 
 def preview_host(page, item)
   state = editor_session(page, item, "main.rb")
-  host = container(alignment: "top_left",
+  host = container(alignment: { x: -1, y: -1 },
     content: state[:preview] || preview_for(page, item[:slug], large: true))
   state[:preview_host] = host
   host
@@ -1442,9 +1442,9 @@ def calc_button(value, large, apply)
 end
 
 def static_calculator_thumbnail
-  container(width: 240, padding: 12, border_radius: 16, bgcolor: "#000000",
-    content: column(spacing: 7, children: [
-      row(alignment: "end", children: [text("0", style: { color: "#ffffff", size: 15 })]),
+  container(width: 224, padding: 8, border_radius: 14, bgcolor: "#000000",
+    content: column(spacing: 4, children: [
+      row(alignment: "end", children: [text("0", style: { color: "#ffffff", size: 13 })]),
       static_calc_row([false, false, false, true]),
       static_calc_row([false, false, false, true]),
       static_calc_row([false, false, false, true]),
@@ -1453,11 +1453,11 @@ def static_calculator_thumbnail
 end
 
 def static_calc_row(actions)
-  row(spacing: 6, children: actions.map { |action| static_calc_button(action) })
+  row(spacing: 5, children: actions.map { |action| static_calc_button(action) })
 end
 
 def static_calc_button(action)
-  container(width: 44, height: 22, border_radius: 16, bgcolor: action ? ORANGE : "#3f3f3f")
+  container(width: 40, height: 18, border_radius: 12, bgcolor: action ? ORANGE : "#3f3f3f")
 end
 
 def static_todo_thumbnail
@@ -1478,12 +1478,20 @@ def static_todo_line(done, label)
 end
 
 def static_flet_logo_thumbnail
-  row(alignment: "center", spacing: 16, children: [
-    logo_column("#df3266", [3, 2, 3]),
-    logo_column("#ffc13d", [1, 1, 4]),
-    logo_column("#88c557", [4, 2, 4]),
-    logo_column("#5d3dbb", [4, 1, 1])
+  row(tight: true, alignment: "center", spacing: 8, children: [
+    compact_logo_column("#df3266", [3, 2, 3]),
+    compact_logo_column("#ffc13d", [1, 1, 4]),
+    compact_logo_column("#88c557", [4, 2, 4]),
+    compact_logo_column("#5d3dbb", [4, 1, 1])
   ])
+end
+
+def compact_logo_column(color, rows)
+  column(tight: true, spacing: 3, children: rows.map do |count|
+    row(tight: true, spacing: 3, children: Array.new(count) do
+      container(width: 9, height: 9, bgcolor: color, border_radius: 2)
+    end)
+  end)
 end
 
 def static_icons_thumbnail
