@@ -516,7 +516,86 @@ def item_files(item)
 end
 
 def selected_code(page, item)
-  item_files(item).fetch(selected_file(page, item))
+  file = selected_file(page, item)
+  editor_session(page, item, file)[:code]
+end
+
+def editor_sessions(page)
+  sessions = page.instance_variable_get(:@ruflet_studio_editor_sessions)
+  return sessions if sessions
+
+  sessions = {}
+  page.instance_variable_set(:@ruflet_studio_editor_sessions, sessions)
+  sessions
+end
+
+def editor_session(page, item, file)
+  key = "#{item[:slug]}:#{file}"
+  editor_sessions(page)[key] ||= {
+    code: item_files(item).fetch(file),
+    editable: false,
+    preview: nil,
+    preview_host: nil
+  }
+end
+
+class StudioPreviewPage
+  attr_reader :controls
+
+  def initialize(page)
+    @page = page
+    @controls = []
+  end
+
+  def add(*controls)
+    @controls.concat(controls.flatten.compact)
+    self
+  end
+
+  def clean
+    @controls.clear
+    self
+  end
+
+  def title=(_value); end
+
+  def method_missing(name, *args, &block)
+    @page.public_send(name, *args, &block)
+  end
+
+  def respond_to_missing?(name, include_private = false)
+    @page.respond_to?(name, include_private) || super
+  end
+end
+
+def evaluate_editor_code(page, source)
+  runner_name = :RUFLET_STUDIO_PREVIEW_RUNNER
+  replacement = "#{runner_name} = proc do |page|"
+  rewritten = source.sub(/Ruflet\s*\.\s*run\s+do\s*\|\s*page\s*\|/, replacement)
+  raise "Preview code must contain Ruflet.run do |page|" if rewritten == source
+
+  sandbox = Module.new
+  builder = Ruflet::WidgetBuilder.new
+  sandbox.define_singleton_method(:method_missing) do |name, *args, **kwargs, &block|
+    if builder.respond_to?(name)
+      builder.public_send(name, *args, **kwargs, &block)
+    else
+      super(name, *args, **kwargs, &block)
+    end
+  end
+  sandbox.define_singleton_method(:respond_to_missing?) do |name, include_private = false|
+    builder.respond_to?(name, include_private) || super(name, include_private)
+  end
+  sandbox.module_eval(rewritten, "ruflet-studio-preview/main.rb", 1)
+  sandbox.extend(sandbox)
+  runner = sandbox.const_get(runner_name)
+  preview_page = StudioPreviewPage.new(page)
+  runner.call(preview_page)
+  raise "The app did not add any controls to the page" if preview_page.controls.empty?
+
+  return preview_page.controls.first if preview_page.controls.length == 1
+
+  column(spacing: 0, children: preview_page.controls)
 end
 
 def examples_for(category_slug)
@@ -919,9 +998,10 @@ def mobile_editor_workspace(page, item)
 end
 
 def mobile_preview_pane(page, item)
+  host = preview_host(page, item)
   container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 14,
     content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
-      children: [preview_for(page, item[:slug], large: true)]))
+      children: [host]))
 end
 
 def mobile_workspace_tab(page, label, icon_value, tab_key, selected)
@@ -981,28 +1061,83 @@ end
 
 def code_pane(page, item)
   compact = mobile?(page)
-  status = text(compact ? "Read-only preview" : "Read-only preview. Fork it to make changes.",
+  file = selected_file(page, item)
+  state = editor_session(page, item, file)
+  status = text(state[:editable] ? "Editing preview" : "Read-only preview",
     style: { color: MUTED, size: compact ? 12 : 14 }, max_lines: 1)
-  editor = code_editor(selected_code(page, item), language: "ruby", code_theme: "atom-one-dark", read_only: true, expand: true)
+  lock_icon = icon(icon: state[:editable] ? Ruflet::MaterialIcons[:edit] : Ruflet::MaterialIcons[:lock], color: MUTED, size: 20)
+  run_button = nil
+  editor = code_editor(
+    state[:code],
+    language: "ruby",
+    code_theme: "atom-one-dark",
+    read_only: !state[:editable],
+    expand: true,
+    on_change: ->(event) { state[:code] = event.value.to_s }
+  )
+  unlock = lambda do |_event|
+    next if state[:editable]
+
+    state[:editable] = true
+    page.update(editor, read_only: false, autofocus: true)
+    page.update(run_button, disabled: false)
+    page.update(lock_icon, icon: Ruflet::MaterialIcons[:edit], color: BLUE)
+    page.update(status, value: "Editing preview", style: { color: BLUE, size: compact ? 12 : 14 })
+  end
+  run_button = filled_button(
+    height: 36,
+    disabled: !state[:editable],
+    content: row(tight: true, spacing: 6, children: [
+      icon(icon: Ruflet::MaterialIcons[:play_arrow], size: 18),
+      text("Run")
+    ]),
+    on_click: ->(_event) { run_editor_preview(page, item, status) }
+  )
   container(expand: true, bgcolor: EDITOR_BG, content: column(expand: true, spacing: 0, children: [
     container(height: compact ? 52 : 66, bgcolor: "#2a2d33", padding: { left: compact ? 12 : 20, right: compact ? 12 : 18 },
       content: row(spacing: 10, children: [
-        icon(icon: Ruflet::MaterialIcons[:lock], color: MUTED, size: 20),
+        run_button,
+        lock_icon,
         status,
         container(expand: true, content: text("")),
         *(compact ? [] : [outlined_button(content: row(spacing: 8, children: [icon(icon: Ruflet::MaterialIcons[:fork_right]), text("Fork")]), disabled: true)])
       ])),
-    container(expand: true, content: editor)
+    gesture_detector(expand: true, on_double_tap: unlock, content: editor)
   ]))
 end
 
 def preview_pane(page, item)
+  host = preview_host(page, item)
   container(expand: true, bgcolor: "#12161a", content: column(expand: true, spacing: 0, children: [
     container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24,
       content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
-        children: [preview_for(page, item[:slug], large: true)])),
+        children: [host])),
     console_bar
   ]))
+end
+
+def preview_host(page, item)
+  state = editor_session(page, item, "main.rb")
+  host = container(alignment: "top_left",
+    content: state[:preview] || preview_for(page, item[:slug], large: true))
+  state[:preview_host] = host
+  host
+end
+
+def run_editor_preview(page, item, status)
+  state = editor_session(page, item, "main.rb")
+  rendered = evaluate_editor_code(page, state[:code])
+  state[:preview] = rendered
+  page.update(status, value: "Preview updated", style: { color: "#4ade80", size: mobile?(page) ? 12 : 14 })
+
+  if mobile?(page)
+    studio_go(page, tab_route(page, "preview"))
+  elsif state[:preview_host]
+    page.update(state[:preview_host], content: rendered)
+  end
+rescue Exception => error # User-authored preview code can raise SyntaxError or SystemExit.
+  message = "Run failed: #{error.message}"
+  page.update(status, value: message, style: { color: "#f87171", size: mobile?(page) ? 12 : 14 })
 end
 
 def console_bar
