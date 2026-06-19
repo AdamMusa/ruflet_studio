@@ -285,7 +285,7 @@ def slugify(value)
   value.to_s.gsub(/([a-z])([A-Z])/, '\1-\2').downcase.gsub(/[^a-z0-9]+/, "-").gsub(/\A-|-+\z/, "")
 end
 
-def path(page) = page.route.to_s.split("?").first
+def route_path(page) = page.route.to_s.split("?").first
 def mobile?(page) = page.width.to_f.positive? && page.width.to_f < 700
 def examples_for(category_slug)
   EXAMPLES.select { |item| item[:category] == category_slug } +
@@ -492,7 +492,7 @@ def selected_file(page, item)
 end
 
 def file_route(page, file)
-  base = path(page)
+  base = route_path(page)
   query = "file=#{CGI.escape(file)}"
   origin = page.query["from"].to_s
   query += "&from=#{CGI.escape(origin)}" unless origin.empty?
@@ -618,7 +618,7 @@ def show_sign_in_dialog(page)
 end
 
 def render(page)
-  route = path(page)
+  route = route_path(page)
   route = "/apps" if route.empty? || route == "/"
   page.title = "ruflet_studio"
   page.theme_mode = "dark"
@@ -672,7 +672,7 @@ def top_bar(page, title, back: nil, actions: [])
 end
 
 def desktop_shell(page, title, active, body)
-  control(:view, route: path(page), bgcolor: BG, padding: 0, appbar: top_bar(page, title),
+  control(:view, route: route_path(page), bgcolor: BG, padding: 0, appbar: top_bar(page, title),
     children: [
       row(expand: true, spacing: 0, children: [
         nav_rail(page, active),
@@ -683,7 +683,7 @@ def desktop_shell(page, title, active, body)
 end
 
 def mobile_shell(page, title, active, body)
-  control(:view, route: path(page), bgcolor: BG, padding: 0, appbar: top_bar(page, title),
+  control(:view, route: route_path(page), bgcolor: BG, padding: 0, appbar: top_bar(page, title),
     children: [
       column(expand: true, spacing: 0, children: [
         container(expand: true, content: body),
@@ -919,7 +919,7 @@ def category_view(page, slug)
     ])),
     *rows.map { |item| example_row(page, item, slug) }
   ]
-  control(:view, route: path(page), bgcolor: BG, padding: 0, appbar: top_bar(page, category[0], back: "/gallery"),
+  control(:view, route: route_path(page), bgcolor: BG, padding: 0, appbar: top_bar(page, category[0], back: "/gallery"),
     children: [column(expand: true, scroll: "auto", spacing: 0, children: children)])
 end
 
@@ -958,7 +958,7 @@ def editor_view(page, item, back_route:)
       mobile_editor_workspace(page, item)
     end
 
-  control(:view, route: path(page), bgcolor: BG, padding: 0,
+  control(:view, route: route_path(page), bgcolor: BG, padding: 0,
     appbar: top_bar(page, item[:title], back: back_route, actions: actions),
     children: [workspace])
 end
@@ -1029,7 +1029,7 @@ end
 
 # Route to a workspace tab, preserving the selected file and the back origin.
 def tab_route(page, tab, file: nil)
-  base = path(page)
+  base = route_path(page)
   selected = file || page.query["file"]
   origin = page.query["from"]
   params = { "tab" => tab }
@@ -1624,7 +1624,7 @@ def settings_view(page, tab)
   }
   active_label, content = tabs[tab] || tabs["system"]
 
-  control(:view, route: path(page), bgcolor: BG, padding: 0,
+  control(:view, route: route_path(page), bgcolor: BG, padding: 0,
     appbar: app_bar(bgcolor: BAR, color: TEXT,
       leading: icon_button(icon: Ruflet::MaterialIcons::CLOSE, on_click: ->(_e) { studio_go(page, "/apps") }),
       title: text("Settings", style: { color: TEXT, size: 20, weight: "w700" })),
