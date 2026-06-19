@@ -209,6 +209,20 @@ module Showcase
     def color_nav_indicator(page) = theme_colors(page)[:nav_indicator]
     def color_accent(page) = theme_colors(page)[:accent]
 
+    def preview_content_width(page, max:, margin: 56, min: 240)
+      viewport = page.width.to_f
+      return max if viewport <= 0
+
+      [[viewport - margin, min].max, max].min
+    end
+
+    def preview_content_height(page, max:, chrome: 210, min: 280)
+      viewport = page.height.to_f
+      return max if viewport <= 0
+
+      [[viewport - chrome, min].max, max].min
+    end
+
     def read_number(data, key)
       return nil unless data
       return data if data.is_a?(Numeric)
@@ -329,8 +343,10 @@ module Showcase
 
     def build_calculator(page, status)
       display = calculator_display(page)
+      calculator_width = preview_content_width(page, max: 420, min: 300)
+      key_width = [[(calculator_width - 42) / 4.0, 56].max, 78].min
       container(
-        width: 420,
+        width: calculator_width,
         padding: 12,
         border_radius: 12,
         bgcolor: color_panel(page),
@@ -341,11 +357,11 @@ module Showcase
             container(height: 24),
             row(alignment: "end", children: [display]),
             container(height: 20),
-            calculator_keypad_row(page, display, status, "BS", "AC", "%", "/"),
-            calculator_keypad_row(page, display, status, "7", "8", "9", "x"),
-            calculator_keypad_row(page, display, status, "4", "5", "6", "-"),
-            calculator_keypad_row(page, display, status, "1", "2", "3", "+"),
-            calculator_keypad_row(page, display, status, "+/-", "0", ".", "=")
+            calculator_keypad_row(page, display, status, key_width, "BS", "AC", "%", "/"),
+            calculator_keypad_row(page, display, status, key_width, "7", "8", "9", "x"),
+            calculator_keypad_row(page, display, status, key_width, "4", "5", "6", "-"),
+            calculator_keypad_row(page, display, status, key_width, "1", "2", "3", "+"),
+            calculator_keypad_row(page, display, status, key_width, "+/-", "0", ".", "=")
           ]
         )
       )
@@ -363,14 +379,14 @@ module Showcase
       )
     end
 
-    def calculator_keypad_row(page, display, status, *labels)
+    def calculator_keypad_row(page, display, status, key_width, *labels)
       row(
         alignment: "center",
         spacing: 6,
         children: labels.map do |label|
           elevated_button(
             content: text(value: label),
-            width: 78,
+            width: key_width,
             height: 65,
             color: calculator_key_text_color(page, label),
             bgcolor: calculator_key_bg(page, label),
@@ -546,7 +562,7 @@ module Showcase
         language: "ruby",
         code_theme: theme_mode == "dark" ? "atom-one-dark" : "atom-one-light",
         read_only: false,
-        expand: true,
+        height: preview_content_height(page, max: 520, min: 320),
         on_change: ->(e) { page.update(status, value: "#{e.data.to_s.length} characters") },
         on_focus: ->(_e) { page.update(status, value: "Editor focused") },
         on_blur: ->(_e) { page.update(status, value: "Editor blurred") }
@@ -555,7 +571,6 @@ module Showcase
       read_only = false
 
       column(
-        expand: true,
         spacing: 12,
         children: [
           status,
@@ -577,7 +592,7 @@ module Showcase
             ]
           ),
           container(
-            expand: true,
+            height: preview_content_height(page, max: 520, min: 320),
             border_radius: 12,
             bgcolor: color_panel(page),
             content: editor
@@ -891,7 +906,7 @@ module Showcase
       when "interactive-viewer"
         interactive_viewer(
           container(
-            width: 360,
+            width: preview_content_width(page, max: 360),
             height: 220,
             padding: 18,
             bgcolor: "#172033",
@@ -1498,7 +1513,6 @@ module Showcase
       end
 
       container(
-        expand: true,
         alignment: "center",
         content: column(
           alignment: "center",
@@ -2489,7 +2503,6 @@ module Showcase
             ]
           )
         ],
-        expand: true,
         initial_center: center,
         initial_zoom: 13,
         min_zoom: 2,
@@ -2500,7 +2513,6 @@ module Showcase
 
       column(
         spacing: 8,
-        expand: true,
         children: [
           status,
           row(
@@ -2518,8 +2530,7 @@ module Showcase
             ]
           ),
           container(
-            expand: true,
-            height: 520,
+            height: preview_content_height(page, max: 520, min: 320),
             content: map_control
           )
         ]
@@ -3379,15 +3390,13 @@ module Showcase
       # (including ruflet.dev via X-Frame-Options) refuse to be embedded in.
       return unsupported_feature_panel(page, "WebView", "webview") unless feature_supported?(page, "webview")
 
+      webview_height = preview_content_height(page, max: 640, min: 360)
       webview_control = web_view(
         url: "https://ruflet.dev/",
         method: "get",
-        expand: true
+        height: webview_height
       )
-      container(
-        expand: true,
-        content: webview_control
-      )
+      container(height: webview_height, content: webview_control)
     end
   end
 end
@@ -3458,7 +3467,7 @@ module Showcase
       end
 
       container(
-        width: 760,
+        width: preview_content_width(page, max: 760),
         content: column(
           spacing: 10,
           alignment: Ruflet::MainAxisAlignment::CENTER,
@@ -3706,7 +3715,7 @@ module Showcase
 
       drawing_canvas = canvas(
         demo_shapes,
-        width: 420,
+        width: preview_content_width(page, max: 420),
         height: 260,
         content: gesture_detector(
           on_pan_start: ->(e) {
