@@ -531,14 +531,27 @@ end
 
 def editor_session(page, item, file)
   key = "#{item[:slug]}:#{file}"
+  initial_code = item_files(item).fetch(file).to_s
   editor_sessions(page)[key] ||= {
-    code: item_files(item).fetch(file),
+    code: initial_code.dup,
+    last_successful_code: initial_code.dup,
     editable: false,
     preview: nil,
+    last_successful_preview: nil,
     preview_host: nil
   }
 end
 
+def editor_change_source(event)
+  data = event.data
+  data = data["value"] || data[:value] if data.is_a?(Hash)
+  data.to_s
+end
+
+# Page proxy used to render an example's OWN code into the preview area:
+# `page.add` collects the controls so we can host them in the preview, while the
+# app-level setters are ignored and everything else (notably `page.update`, used
+# by live handlers like the counter buttons) flows through to the real page.
 class StudioPreviewPage
   attr_reader :controls
 
@@ -558,6 +571,8 @@ class StudioPreviewPage
   end
 
   def title=(_value); end
+  def theme_mode=(_value); end
+  def bgcolor=(_value); end
 
   def method_missing(name, *args, &block)
     @page.public_send(name, *args, &block)
@@ -568,34 +583,21 @@ class StudioPreviewPage
   end
 end
 
-def evaluate_editor_code(page, source)
-  runner_name = :RUFLET_STUDIO_PREVIEW_RUNNER
-  replacement = "#{runner_name} = proc do |page|"
-  rewritten = source.sub(/Ruflet\s*\.\s*run\s+do\s*\|\s*page\s*\|/, replacement)
-  raise "Preview code must contain Ruflet.run do |page|" if rewritten == source
+# Render the example's own source (the editable string) into a preview.
+# We rewrite `Ruflet.run do |page|` into a lambda and run it in the studio's own
+# context, so the DSL (text, column, ...) resolves directly — no sandbox. The
+# caller then repaints the preview with page.update, so edits take effect.
+def render_example_code(page, source)
+  lambda_src = source.sub(/Ruflet\s*\.\s*run\s+do\s*\|\s*page\s*\|/, "lambda do |page|")
+  raise "Code must contain `Ruflet.run do |page|`" if lambda_src == source
 
-  sandbox = Module.new
-  builder = Ruflet::WidgetBuilder.new
-  sandbox.define_singleton_method(:method_missing) do |name, *args, **kwargs, &block|
-    if builder.respond_to?(name)
-      builder.public_send(name, *args, **kwargs, &block)
-    else
-      super(name, *args, **kwargs, &block)
-    end
-  end
-  sandbox.define_singleton_method(:respond_to_missing?) do |name, include_private = false|
-    builder.respond_to?(name, include_private) || super(name, include_private)
-  end
-  sandbox.module_eval(rewritten, "ruflet-studio-preview/main.rb", 1)
-  sandbox.extend(sandbox)
-  runner = sandbox.const_get(runner_name)
+  runner = eval(lambda_src, binding) # rubocop:disable Security/Eval
   preview_page = StudioPreviewPage.new(page)
   runner.call(preview_page)
-  raise "The app did not add any controls to the page" if preview_page.controls.empty?
+  controls = preview_page.controls
+  raise "The app did not add any controls to the page" if controls.empty?
 
-  return preview_page.controls.first if preview_page.controls.length == 1
-
-  column(spacing: 0, children: preview_page.controls)
+  controls.length == 1 ? controls.first : column(spacing: 0, children: controls)
 end
 
 def examples_for(category_slug)
@@ -1073,7 +1075,7 @@ def code_pane(page, item)
     code_theme: "atom-one-dark",
     read_only: !state[:editable],
     expand: true,
-    on_change: ->(event) { state[:code] = event.value.to_s }
+    on_change: ->(event) { state[:code].replace(editor_change_source(event)) }
   )
   unlock = lambda do |_event|
     next if state[:editable]
@@ -1118,16 +1120,31 @@ end
 
 def preview_host(page, item)
   state = editor_session(page, item, "main.rb")
+  unless state[:preview]
+    state[:preview] = render_example_code(page, state[:code])
+    state[:last_successful_preview] = state[:preview]
+  end
   host = container(alignment: { x: -1, y: -1 },
-    content: state[:preview] || preview_for(page, item[:slug], large: true))
+    content: state[:preview])
+  state[:preview_host] = host
+  host
+rescue Exception # User-authored source can raise SyntaxError or SystemExit.
+  fallback = state[:last_successful_preview] || preview_for(page, item[:slug], large: true)
+  state[:preview] = fallback
+  state[:last_successful_preview] = fallback
+  host = container(alignment: { x: -1, y: -1 }, content: fallback)
   state[:preview_host] = host
   host
 end
 
+# "Run" evaluates the current source string and replaces the preview host.
+# Failed edits leave the last successful preview mounted.
 def run_editor_preview(page, item, status)
   state = editor_session(page, item, "main.rb")
-  rendered = evaluate_editor_code(page, state[:code])
+  rendered = render_example_code(page, state[:code])
   state[:preview] = rendered
+  state[:last_successful_preview] = rendered
+  state[:last_successful_code].replace(state[:code])
   page.update(status, value: "Preview updated", style: { color: "#4ade80", size: mobile?(page) ? 12 : 14 })
 
   if mobile?(page)
@@ -1135,7 +1152,11 @@ def run_editor_preview(page, item, status)
   elsif state[:preview_host]
     page.update(state[:preview_host], content: rendered)
   end
-rescue Exception => error # User-authored preview code can raise SyntaxError or SystemExit.
+rescue Exception => error # User-authored source can raise SyntaxError or SystemExit.
+  state[:preview] = state[:last_successful_preview] if state
+  if state && state[:preview_host] && state[:last_successful_preview]
+    page.update(state[:preview_host], content: state[:last_successful_preview])
+  end
   message = "Run failed: #{error.message}"
   page.update(status, value: message, style: { color: "#f87171", size: mobile?(page) ? 12 : 14 })
 end

@@ -2626,8 +2626,7 @@ module Showcase
         width: 300,
         height: 300,
         fit: "contain",
-        speed_multiplier: 1.0,
-        placeholder: progress_ring()
+        speed_multiplier: 1.0
       )
 
       column(

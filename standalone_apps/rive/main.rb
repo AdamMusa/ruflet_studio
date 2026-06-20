@@ -33,8 +33,7 @@ Ruflet.run do |page|
     width: 300,
     height: 300,
     fit: "contain",
-    speed_multiplier: 1.0,
-    placeholder: progress_ring()
+    speed_multiplier: 1.0
   )
   page.add(
     container(
