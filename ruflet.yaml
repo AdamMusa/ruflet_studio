@@ -21,6 +21,7 @@ extensions:
   - map
   - rive
   - secure_storage
+  - spinkit
   - video
   - webview
 

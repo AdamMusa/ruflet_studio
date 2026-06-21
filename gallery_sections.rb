@@ -627,6 +627,7 @@ module Showcase
       { label: "Tabs", slug: "tabs", icon: Ruflet::MaterialIcons[:tab] },
       { label: "ProgressBar", slug: "progress-bar", icon: Ruflet::MaterialIcons[:linear_scale] },
       { label: "ProgressRing", slug: "progress-ring", icon: Ruflet::MaterialIcons[:donut_large] },
+      { label: "SpinKit", slug: "spinkit", icon: Ruflet::MaterialIcons[:autorenew] },
       { label: "GridView", slug: "grid-view", icon: Ruflet::MaterialIcons[:grid_view] },
       { label: "InteractiveViewer", slug: "interactive-viewer", icon: Ruflet::MaterialIcons[:open_with] },
       { label: "ListTile", slug: "list-tile", icon: Ruflet::MaterialIcons::LIST },
@@ -877,6 +878,8 @@ module Showcase
         progress_bar(bar_height: 8, color: "#74c0fc", bgcolor: "#172033")
       when "progress-ring"
         progress_ring(stroke_width: 5, color: "#69db7c", bgcolor: "#172033")
+      when "spinkit"
+        spinkit_gallery(page)
       when "grid-view"
         container(
           height: 260,
@@ -4191,6 +4194,85 @@ module Showcase
         end
       end
       controls
+    end
+  end
+end
+
+# === showcase/sections_controls/spinkit.rb ===
+module Showcase
+  module SectionsControls
+    # All 30 flet_spinkit variants: [ruflet variant keyword, human label].
+    SPINKIT_VARIANTS_SHOWCASE = [
+      [:rotating_circle, "Rotating Circle"],
+      [:rotating_plain, "Rotating Plain"],
+      [:double_bounce, "Double Bounce"],
+      [:wave, "Wave"],
+      [:wandering_cubes, "Wandering Cubes"],
+      [:fading_four, "Fading Four"],
+      [:fading_cube, "Fading Cube"],
+      [:pulse, "Pulse"],
+      [:chasing_dots, "Chasing Dots"],
+      [:three_bounce, "Three Bounce"],
+      [:circle, "Circle"],
+      [:cube_grid, "Cube Grid"],
+      [:fading_circle, "Fading Circle"],
+      [:folding_cube, "Folding Cube"],
+      [:pumping_heart, "Pumping Heart"],
+      [:hour_glass, "Hour Glass"],
+      [:pouring_hour_glass, "Pouring Hour Glass"],
+      [:pouring_hour_glass_refined, "Pouring Hour Glass Refined"],
+      [:fading_grid, "Fading Grid"],
+      [:ring, "Ring"],
+      [:ripple, "Ripple"],
+      [:dual_ring, "Dual Ring"],
+      [:spinning_circle, "Spinning Circle"],
+      [:spinning_lines, "Spinning Lines"],
+      [:square_circle, "Square Circle"],
+      [:three_in_out, "Three In Out"],
+      [:dancing_square, "Dancing Square"],
+      [:piano_wave, "Piano Wave"],
+      [:pulsing_grid, "Pulsing Grid"],
+      [:wave_spinner, "Wave Spinner"]
+    ].freeze
+
+    SPINKIT_PALETTE = %w[
+      #69db7c #74c0fc #ffa94d #b197fc #ff6b6b #3bc9db #f783ac #a9e34b #ffd43b #4dabf7
+    ].freeze
+
+    # A labelled grid of every SpinKit variant. Shared by the Apps gallery card
+    # (build_spinkit) and the Components > SpinKit detail.
+    def spinkit_gallery(page, per_row: 5)
+      cells = SPINKIT_VARIANTS_SHOWCASE.each_with_index.map do |(variant, label), index|
+        color = SPINKIT_PALETTE[index % SPINKIT_PALETTE.size]
+        column(
+          horizontal_alignment: "center",
+          spacing: 8,
+          children: [
+            container(height: 52, width: 90, alignment: "center",
+                      content: spinkit(variant => { color: color, size: 38 })),
+            text(value: label, style: { size: 11, color: color_subtle(page) })
+          ]
+        )
+      end
+
+      rows = cells.each_slice(per_row).map do |slice|
+        row(alignment: "center", spacing: 18, run_spacing: 18, children: slice)
+      end
+
+      column(spacing: 20, horizontal_alignment: "center", children: rows)
+    end
+
+    def build_spinkit(page, status)
+      column(
+        spacing: 16,
+        children: [
+          status,
+          text(value: "All 30 SpinKit loading indicators (flet_spinkit). " \
+                      "Call e.g. spinkit(wave: { color: \"#74c0fc\", size: 48 }).",
+               style: { size: 13, color: color_subtle(page) }),
+          spinkit_gallery(page)
+        ]
+      )
     end
   end
 end

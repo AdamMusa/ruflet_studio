@@ -361,6 +361,7 @@ SHOWCASE_ROUTES = [
   ["calculator", "Calculator", "getting-started", :build_calculator],
   ["code-editor", "Code Editor", "getting-started", :build_code_editor],
   ["responsive-row", "Responsive Row", "layout", :build_responsive_row],
+  ["spinkit", "SpinKit", "displays", :build_spinkit],
   ["components", "Components", "layout", :build_components],
   ["drawing", "Drawing Tool", "effects", :build_drawing],
   ["material", "Material controls", "buttons", :build_material_controls],
@@ -584,16 +585,75 @@ class StudioPreviewPage
 end
 
 # Render the example's own source (the editable string) into a preview.
-# We rewrite `Ruflet.run do |page|` into a lambda and run it in the studio's own
-# context, so the DSL (text, column, ...) resolves directly — no sandbox. The
-# caller then repaints the preview with page.update, so edits take effect.
-def render_example_code(page, source)
-  lambda_src = source.sub(/Ruflet\s*\.\s*run\s+do\s*\|\s*page\s*\|/, "lambda do |page|")
-  raise "Code must contain `Ruflet.run do |page|`" if lambda_src == source
+# Fresh binding whose `self` is the studio's main object, so the DSL (text,
+# column, spinkit, ...) resolves directly — no sandbox. The app body runs *in*
+# this binding (not a lambda) so its locals (e.g. `count`) live in the binding
+# and can be carried across re-runs for best-effort hot reload.
+def new_preview_binding
+  binding
+end
 
-  runner = eval(lambda_src, binding) # rubocop:disable Security/Eval
+# Split `… defs … Ruflet.run do |page| BODY end` into [prelude, body].
+# Prelude = requires/helper defs before the run block; body = the block contents
+# (the trailing standalone `end` that closes the block is dropped).
+def split_ruflet_run(source)
+  marker = source.match(/Ruflet\s*\.\s*run\s+do\s*\|\s*page\s*\|/)
+  raise "Code must contain `Ruflet.run do |page|`" unless marker
+
+  prelude = source[0...marker.begin(0)]
+  rest = source[marker.end(0)..]
+  lines = rest.lines
+  last_end = nil
+  lines.each_with_index { |line, i| last_end = i if line.strip == "end" }
+  raise "Code must contain `Ruflet.run do |page|`" unless last_end
+
+  [prelude, lines[0...last_end].join]
+end
+
+# Values safe to carry across a hot reload: plain state, never live view objects
+# (controls) or handlers (procs). Collections carry only if they hold no controls.
+def preview_state_value?(value)
+  case value
+  when Ruflet::Control, Proc then false
+  when Integer, Float, String, Symbol, TrueClass, FalseClass, NilClass then true
+  when Array then value.all? { |element| preview_state_value?(element) }
+  when Hash then value.values.all? { |element| preview_state_value?(element) }
+  else false
+  end
+end
+
+# Renders the example's editable source into a preview. When a session is given,
+# the body runs in a persistent binding so mutated state (counters, lists, …)
+# is carried over on each Run — only the *view* is rebuilt from the new code.
+# Note: editing an initial value (e.g. `count = 0` → `5`) won't take effect until
+# the binding is reset (reload the app / reopen the example), matching hot-reload
+# semantics — Run re-applies the view but keeps live state.
+def render_example_code(page, source, session: nil)
+  prelude, body = split_ruflet_run(source)
   preview_page = StudioPreviewPage.new(page)
-  runner.call(preview_page)
+
+  eval_binding = session && session[:eval_binding]
+  eval_binding ||= new_preview_binding
+  session[:eval_binding] = eval_binding if session
+
+  carried = {}
+  if session && session[:eval_started]
+    eval_binding.local_variables.each do |name|
+      next if name == :page
+
+      value = eval_binding.local_variable_get(name)
+      carried[name] = value if preview_state_value?(value)
+    end
+  end
+
+  eval_binding.local_variable_set(:page, preview_page)
+  eval("#{prelude}\n#{body}", eval_binding) # rubocop:disable Security/Eval
+
+  carried.each do |name, value|
+    eval_binding.local_variable_set(name, value) if eval_binding.local_variables.include?(name)
+  end
+  session[:eval_started] = true if session
+
   controls = preview_page.controls
   raise "The app did not add any controls to the page" if controls.empty?
 
@@ -1121,7 +1181,7 @@ end
 def preview_host(page, item)
   state = editor_session(page, item, "main.rb")
   unless state[:preview]
-    state[:preview] = render_example_code(page, state[:code])
+    state[:preview] = render_example_code(page, state[:code], session: state)
     state[:last_successful_preview] = state[:preview]
   end
   host = container(alignment: { x: -1, y: -1 },
@@ -1141,7 +1201,7 @@ end
 # Failed edits leave the last successful preview mounted.
 def run_editor_preview(page, item, status)
   state = editor_session(page, item, "main.rb")
-  rendered = render_example_code(page, state[:code])
+  rendered = render_example_code(page, state[:code], session: state)
   state[:preview] = rendered
   state[:last_successful_preview] = rendered
   state[:last_successful_code].replace(state[:code])
@@ -1198,10 +1258,26 @@ def showcase_thumbnail(item)
   return static_icons_thumbnail if slug == "icon-search"
   return static_flet_logo_thumbnail if slug == "animation"
   return compact_rive_thumbnail if slug == "rive"
+  return compact_spinkit_thumbnail if slug == "spinkit"
   return compact_media_thumbnail(item) if item[:category] == "media"
   return static_control_thumbnail(item[:slug]) if item[:component_slug]
 
   compact_feature_thumbnail(item)
+end
+
+def compact_spinkit_thumbnail
+  column(tight: true, horizontal_alignment: "center", spacing: 12, children: [
+    row(tight: true, alignment: "center", spacing: 14, children: [
+      spinkit(rotating_circle: { color: "#2563eb", size: 30 }),
+      spinkit(wave: { color: "#7c3aed", size: 30 }),
+      spinkit(cube_grid: { color: "#db2777", size: 30 })
+    ]),
+    row(tight: true, alignment: "center", spacing: 14, children: [
+      spinkit(pumping_heart: { color: "#ef4444", size: 30 }),
+      spinkit(dual_ring: { color: "#0ea5e9", size: 30 }),
+      spinkit(folding_cube: { color: "#16a34a", size: 30 })
+    ])
+  ])
 end
 
 def compact_counter_thumbnail
