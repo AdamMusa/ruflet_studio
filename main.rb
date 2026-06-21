@@ -574,8 +574,8 @@ class StudioPreviewPage
   def theme_mode=(_value); end
   def bgcolor=(_value); end
 
-  def method_missing(name, *args, &block)
-    @page.public_send(name, *args, &block)
+  def method_missing(name, *args, **kwargs, &block)
+    @page.public_send(name, *args, **kwargs, &block)
   end
 
   def respond_to_missing?(name, include_private = false)
