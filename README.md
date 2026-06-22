@@ -1,8 +1,8 @@
 # Ruflet Studio
 
-**Ruflet Studio is built with [Ruflet](https://github.com/AdamMusa/ruflet) and written 100% in pure Ruby — no Dart, no JavaScript, no Python.**
+**Ruflet Studio is built with [Ruflet](https://github.com/AdamMusa/ruflet) and written 100% in pure Ruby — no Dart, no JavaScript.**
 
-It's a Ruflet-native take on Flet Studio: an Apps grid, a browsable example **Gallery**, a live code editor with an instant preview pane, a console bar, sign-in dialog, and settings — all driven by a single Ruby codebase that runs natively on iOS, Android, desktop, and the web.
+It's a Ruflet-native app: an Apps grid, a browsable example **Gallery**, a live code editor with an instant preview pane, a console bar, sign-in dialog, and settings — all driven by a single Ruby codebase that runs natively on iOS, Android, desktop, and the web.
 
 > Every screen, control, animation, and the 30+ loading spinners below are described in Ruby. Ruflet renders them through a Flutter client, so the same `main.rb` ships everywhere.
 
@@ -14,13 +14,13 @@ The Gallery — categories on the left, live example cards on the right:
 
 ![Gallery (desktop)](docs/screenshots/gallery-desktop.png)
 
-The example editor — read/edit the Ruby source on the left, see the live Ruflet preview on the right (here: all 30 `flet_spinkit` indicators, 3 per row):
+The example editor — read/edit the Ruby source on the left, see the live Ruflet preview on the right:
 
 ![SpinKit editor (desktop)](docs/screenshots/editor-spinkit-desktop.png)
 
 ### Mobile
 
-The same app, responsive on a phone — category list and the SpinKit preview:
+The same app, responsive on a phone:
 
 | Gallery | SpinKit preview |
 | --- | --- |
@@ -28,14 +28,14 @@ The same app, responsive on a phone — category list and the SpinKit preview:
 
 ## Why it matters
 
-- **100% Ruby.** The UI is plain Ruby (`text`, `column`, `container`, `spinkit(...)`, …). No FFI, no templating, no client code to maintain.
+- **100% Ruby.** The UI is plain Ruby (`text`, `column`, `container`, `spinkit(...)`, …).
 - **One codebase, every platform.** `ruflet run` for instant dev, `ruflet build` for self-contained iOS/Android/macOS/Windows/Linux/web apps.
 - **Live preview + best-effort hot reload.** Edit an example's source and hit **Run**; the preview re-renders and carries over mutated state (e.g. a counter keeps its value across edits).
 
 ## Requirements
 
 - Ruby 3.x and Bundler
-- The [Ruflet](https://github.com/AdamMusa/ruflet) toolchain (`ruflet` CLI). For device/desktop/web builds you also need the Flutter SDK and the relevant platform tools (Xcode for iOS, Android SDK for Android).
+- The [Ruflet](https://github.com/AdamMusa/ruflet) toolchain (`ruflet` CLI). Run `ruflet doctor --fix` and it installs everything needed to build.
 
 ## Setup
 
@@ -48,9 +48,9 @@ bundle install
 The fastest loop. Starts the Ruflet backend and shows a QR code / URL to open in a Ruflet client:
 
 ```bash
-ruflet run main            # mobile (scan the QR from the Ruflet client app)
-ruflet run --web main      # open in a browser
-ruflet run --desktop main  # native desktop window
+ruflet run main.rb            # mobile (scan the QR from the Ruflet client app)
+ruflet run main.rb --web      # open in a browser
+ruflet run main.rb --desktop  # native desktop window
 ```
 
 ## Build self-contained apps
