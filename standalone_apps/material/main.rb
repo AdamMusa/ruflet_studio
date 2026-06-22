@@ -22,7 +22,7 @@ Ruflet.run do |page|
   build_banner = lambda do
     banner(
       open: true,
-      leading: icon(icon: Ruflet::MaterialIcons::INFO),
+      leading: icon(icon: "info"),
       content: text(value: "Backup completed successfully."),
       actions: [
         text_button(content: text(value: "Dismiss"), on_click: ->(_e) { page.pop_dialog })
@@ -108,7 +108,7 @@ Ruflet.run do |page|
               )
             )
           ),
-          list_tile(leading: icon(icon: Ruflet::MaterialIcons::INFO), title: text(value: "ListTile"))
+          list_tile(leading: icon(icon: "info"), title: text(value: "ListTile"))
         ]
       )
     )

@@ -30,7 +30,7 @@ Ruflet.run do |page|
                 spacing: 6,
                 horizontal_alignment: "center",
                 children: [
-                  icon(icon: Ruflet::MaterialIcons[:widgets], color: "#9dccff"),
+                  icon(icon: "widgets", color: "#9dccff"),
                   text(value: "Item #{index}", style: { size: 13, color: "#111827" })
                 ]
               )

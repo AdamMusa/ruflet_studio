@@ -27,7 +27,7 @@ Ruflet.run do |page|
             children: [
               button(
                 content: "Pick files",
-                icon: Ruflet::MaterialIcons::UPLOAD_FILE,
+                icon: "upload_file",
                 on_click: ->(_e) do
                   next if picker_in_flight
                   picker_in_flight = true
@@ -55,7 +55,7 @@ Ruflet.run do |page|
             children: [
               button(
                 content: "Save file",
-                icon: Ruflet::MaterialIcons::SAVE,
+                icon: "save",
                 on_click: ->(_e) do
                   next if picker_in_flight
                   picker_in_flight = true
@@ -85,7 +85,7 @@ Ruflet.run do |page|
               children: [
                 button(
                   content: "Open directory",
-                  icon: Ruflet::MaterialIcons::FOLDER_OPEN,
+                  icon: "folder_open",
                   on_click: ->(_e) do
                     next if picker_in_flight
                     picker_in_flight = true

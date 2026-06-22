@@ -30,15 +30,15 @@ RAIL_BLUE = "#082f49"
 ORANGE = "#f7a12d"
 
 CATEGORIES = [
-  ["Getting Started", "Build your first Ruflet app", Ruflet::MaterialIcons[:rocket_launch], "getting-started"],
-  ["Layout", "Layout primitives and containers", Ruflet::MaterialIcons::VIEW_MODULE, "layout"],
-  ["Components", "Individual control demos", Ruflet::MaterialIcons[:widgets], "components"],
-  ["Displays", "Text, images, and information controls", Ruflet::MaterialIcons::IMAGE, "displays"],
-  ["Charts", "Data visualization examples", Ruflet::MaterialIcons::SHOW_CHART, "charts"],
-  ["Games", "Interactive game examples", Ruflet::MaterialIcons[:sports_esports], "games"],
-  ["Animations", "Motion and state transitions", Ruflet::MaterialIcons[:animation], "animations"],
-  ["Effects", "Visual effects and polish", Ruflet::MaterialIcons[:auto_awesome], "effects"],
-  ["Media", "Media and platform integrations", Ruflet::MaterialIcons[:movie], "media"]
+  ["Getting Started", "Build your first Ruflet app", "rocket_launch", "getting-started"],
+  ["Layout", "Layout primitives and containers", "view_module", "layout"],
+  ["Components", "Individual control demos", "widgets", "components"],
+  ["Displays", "Text, images, and information controls", "image", "displays"],
+  ["Charts", "Data visualization examples", "show_chart", "charts"],
+  ["Games", "Interactive game examples", "sports_esports", "games"],
+  ["Animations", "Motion and state transitions", "animation", "animations"],
+  ["Effects", "Visual effects and polish", "auto_awesome", "effects"],
+  ["Media", "Media and platform integrations", "movie", "media"]
 ].freeze
 
 EXAMPLES = [
@@ -215,9 +215,9 @@ EXAMPLES = [
         page.add(column(spacing: 12, children: [
           text_field(label: "Search icons", value: "add"),
           grid_view(runs_count: 5, max_extent: 90, children: [
-            icon(icon: Ruflet::MaterialIcons::ADD),
-            icon(icon: Ruflet::MaterialIcons::PHOTO_CAMERA),
-            icon(icon: Ruflet::MaterialIcons::ALARM)
+            icon(icon: "add"),
+            icon(icon: "photo_camera"),
+            icon(icon: "alarm")
           ])
         ]))
       end
@@ -696,9 +696,9 @@ def top_bar(page, title, back: nil, actions: [])
     color: TEXT,
     # iOS centers the title by default; keep it left-aligned next to the back button.
     center_title: false,
-    leading: back ? icon_button(icon: Ruflet::MaterialIcons::ARROW_BACK, on_click: ->(_e) { studio_go(page, back) }) : nil,
+    leading: back ? icon_button(icon: "arrow_back", on_click: ->(_e) { studio_go(page, back) }) : nil,
     title: title_control,
-    actions: actions + [icon_button(icon: Ruflet::MaterialIcons[:account_circle], on_click: ->(_e) { studio_go(page, "/settings/system") })]
+    actions: actions + [icon_button(icon: "account_circle", on_click: ->(_e) { studio_go(page, "/settings/system") })]
   )
 end
 
@@ -731,9 +731,9 @@ def nav_rail(page, active)
   container(width: 72, bgcolor: BG, content: column(spacing: 10, children: [
     container(height: 62, padding: { top: 10, left: 10, right: 10, bottom: 4 },
       content: container(width: 48, height: 48, border_radius: 14, bgcolor: SURFACE_2, alignment: "center",
-        on_click: ->(_e) { show_sign_in_dialog(page) }, content: icon(icon: Ruflet::MaterialIcons::ADD, color: TEXT, size: 24))),
-    rail_item(page, "Apps", Ruflet::MaterialIcons::GRID_VIEW, "/apps", active == "apps"),
-    rail_item(page, "Gallery", Ruflet::MaterialIcons::IMAGE, "/gallery", active == "gallery")
+        on_click: ->(_e) { show_sign_in_dialog(page) }, content: icon(icon: "add", color: TEXT, size: 24))),
+    rail_item(page, "Apps", "grid_view", "/apps", active == "apps"),
+    rail_item(page, "Gallery", "image", "/gallery", active == "gallery")
   ]))
 end
 
@@ -747,8 +747,8 @@ end
 
 def bottom_nav(page, active)
   container(height: 80, bgcolor: BAR, content: row(spacing: 0, children: [
-    bottom_tab(page, "Apps", Ruflet::MaterialIcons::GRID_VIEW, "/apps", active == "apps"),
-    bottom_tab(page, "Gallery", Ruflet::MaterialIcons::IMAGE, "/gallery", active == "gallery")
+    bottom_tab(page, "Apps", "grid_view", "/apps", active == "apps"),
+    bottom_tab(page, "Gallery", "image", "/gallery", active == "gallery")
   ]))
 end
 
@@ -775,7 +775,7 @@ def apps_view(page)
       height: 38,
       on_click: ->(_e) { show_sign_in_dialog(page) },
       content: row(tight: true, spacing: 8, alignment: "center", children: [
-        icon(icon: Ruflet::MaterialIcons[:login]),
+        icon(icon: "login"),
         text("Sign in")
       ])
     )
@@ -790,13 +790,13 @@ def sign_in_dialog(page)
     content: column(tight: true, spacing: 14, children: [
       row(alignment: "center", children: [
         container(expand: true, content: text("Sign in to Ruflet Studio", style: { color: TEXT, size: 30, weight: "w700" })),
-        icon_button(icon: Ruflet::MaterialIcons::CLOSE, icon_color: MUTED, on_click: ->(_e) { studio_go(page, "/apps") })
+        icon_button(icon: "close", icon_color: MUTED, on_click: ->(_e) { studio_go(page, "/apps") })
       ]),
       text("Sign in to create apps, save versions, and access your work from anywhere.", style: { color: TEXT, size: 17 }),
       text("By signing in to Ruflet Studio, you agree to our Terms of Service and Privacy Policy.", style: { color: MUTED, size: 14 }),
-      sign_button("Sign in with GitHub", Ruflet::MaterialIcons[:code]),
-      sign_button("Sign in with Google", Ruflet::MaterialIcons[:g_mobiledata]),
-      sign_button("Sign in with Microsoft", Ruflet::MaterialIcons::GRID_VIEW)
+      sign_button("Sign in with GitHub", "code"),
+      sign_button("Sign in with Google", "g_mobiledata"),
+      sign_button("Sign in with Microsoft", "grid_view")
     ])))
 end
 
@@ -815,7 +815,7 @@ def show_categories_menu?(page) = page.width.to_f >= 760
 def search_field(page)
   text_field(
     label: "Search...",
-    prefix_icon: Ruflet::MaterialIcons::SEARCH,
+    prefix_icon: "search",
     value: page.query["q"],
     expand: true,
     height: 46,
@@ -874,10 +874,10 @@ end
 def gallery_browse_tile(page)
   container(height: 56, content: list_tile(
     content_padding: { left: 12, right: 8, top: 0, bottom: 0 },
-    leading: icon(icon: Ruflet::MaterialIcons::IMAGE, color: PINK, size: 20),
+    leading: icon(icon: "image", color: PINK, size: 20),
     title: text("Gallery", style: { color: TEXT, size: 15, weight: "w700" }),
     subtitle: text("Browse all examples", style: { color: MUTED, size: 12 }),
-    trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: TEXT, size: 20),
+    trailing: icon(icon: "chevron_right", color: TEXT, size: 20),
     on_click: ->(_e) { studio_go(page, "/gallery?view=grid") }))
 end
 
@@ -894,7 +894,7 @@ end
 def gallery_back_bar(page, title)
   container(height: 48, bgcolor: BG, padding: { left: 4, right: 12 },
     content: row(alignment: "center", spacing: 2, children: [
-      icon_button(icon: Ruflet::MaterialIcons::ARROW_BACK, on_click: ->(_e) { studio_go(page, "/gallery") }),
+      icon_button(icon: "arrow_back", on_click: ->(_e) { studio_go(page, "/gallery") }),
       text(title, style: { color: TEXT, size: 16, weight: "w700" })
     ]))
 end
@@ -927,7 +927,7 @@ def category_tile(page, label, icon_value, slug)
     content_padding: { left: 16, right: 12, top: 0, bottom: 0 },
     leading: icon(icon: icon_value, color: TEXT, size: 22),
     title: text(label, style: { color: TEXT, size: 17, weight: "w700" }),
-    trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: TEXT, size: 22),
+    trailing: icon(icon: "chevron_right", color: TEXT, size: 22),
     on_click: ->(_e) { studio_go(page, "/gallery/#{slug}") }))
 end
 
@@ -956,10 +956,10 @@ end
 
 def example_row(page, item, slug)
   list_tile(
-    leading: icon(icon: Ruflet::MaterialIcons[:widgets], color: TEXT),
+    leading: icon(icon: "widgets", color: TEXT),
     title: text(item[:title], style: { color: TEXT, size: 18, weight: "w700" }),
     subtitle: text(item[:description], style: { color: MUTED, size: 14 }),
-    trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: TEXT),
+    trailing: icon(icon: "chevron_right", color: TEXT),
     on_click: ->(_e) { studio_go(page, "/gallery/#{slug}/example/#{item[:slug]}?from=#{CGI.escape("/gallery/#{slug}")}") })
 end
 
@@ -967,16 +967,16 @@ def editor_view(page, item, back_route:)
   actions =
     if page.width.to_f >= 760
       [
-        text_button(content: row(spacing: 6, children: [icon(icon: Ruflet::MaterialIcons[:fork_right], color: TEXT), text("Fork", style: { color: TEXT })])),
-        text_button(content: row(spacing: 6, children: [icon(icon: Ruflet::MaterialIcons[:ios_share], color: TEXT), text("Share", style: { color: TEXT })])),
-        icon_button(icon: Ruflet::MaterialIcons[:open_in_new]),
-        icon_button(icon: Ruflet::MaterialIcons[:download])
+        text_button(content: row(spacing: 6, children: [icon(icon: "fork_right", color: TEXT), text("Fork", style: { color: TEXT })])),
+        text_button(content: row(spacing: 6, children: [icon(icon: "ios_share", color: TEXT), text("Share", style: { color: TEXT })])),
+        icon_button(icon: "open_in_new"),
+        icon_button(icon: "download")
       ]
     else
       # Compact icon-only actions on phones so the app bar doesn't overflow.
       [
-        icon_button(icon: Ruflet::MaterialIcons[:fork_right]),
-        icon_button(icon: Ruflet::MaterialIcons[:download])
+        icon_button(icon: "fork_right"),
+        icon_button(icon: "download")
       ]
     end
 
@@ -1019,9 +1019,9 @@ def mobile_editor_workspace(page, item)
 
   column(expand: true, horizontal_alignment: "stretch", spacing: 0, children: [
     container(height: 48, bgcolor: BAR, content: row(spacing: 0, children: [
-      mobile_workspace_tab(page, "Files", Ruflet::MaterialIcons::FOLDER, "files", tab == "files"),
-      mobile_workspace_tab(page, "Code", Ruflet::MaterialIcons::CODE, "code", tab == "code"),
-      mobile_workspace_tab(page, "Preview", Ruflet::MaterialIcons[:play_circle_outline], "preview", tab == "preview")
+      mobile_workspace_tab(page, "Files", "folder", "files", tab == "files"),
+      mobile_workspace_tab(page, "Code", "code", "code", tab == "code"),
+      mobile_workspace_tab(page, "Preview", "play_circle_outline", "preview", tab == "preview")
     ])),
     container(expand: true, content: body),
     console_bar
@@ -1052,7 +1052,7 @@ def mobile_file_list(page, item)
       container(border_radius: 8, bgcolor: sel ? SURFACE_2 : BG, padding: 12,
         on_click: ->(_e) { studio_go(page, tab_route(page, "code", file: file)) },
         content: row(spacing: 10, children: [
-          icon(icon: Ruflet::MaterialIcons[:insert_drive_file], color: sel ? BLUE : MUTED),
+          icon(icon: "insert_drive_file", color: sel ? BLUE : MUTED),
           text(file, style: { color: TEXT, size: 16, weight: sel ? "w700" : "w500" })
         ]))
     end))
@@ -1076,14 +1076,14 @@ def file_pane(page, item)
     row(children: [
       text("Files", style: { color: TEXT, size: 14, weight: "w700" }),
       container(expand: true, content: text("")),
-      icon(icon: Ruflet::MaterialIcons[:unfold_less], color: TEXT, size: 18)
+      icon(icon: "unfold_less", color: TEXT, size: 18)
     ]),
     *files.keys.map do |file|
       selected = file == current_file
       container(border_radius: 8, bgcolor: selected ? "#1c2630" : BG, padding: { top: 8, bottom: 8, left: 8, right: 8 },
         on_click: ->(_e) { studio_go(page, file_route(page, file)) },
         content: row(spacing: 8, children: [
-          icon(icon: Ruflet::MaterialIcons[:insert_drive_file], color: MUTED),
+          icon(icon: "insert_drive_file", color: MUTED),
           text(file, style: { color: TEXT, size: 15, weight: selected ? "w700" : "w500" })
         ]))
     end
@@ -1096,7 +1096,7 @@ def code_pane(page, item)
   state = editor_session(page, item, file)
   status = text(state[:editable] ? "Editing preview" : "Read-only preview",
     style: { color: MUTED, size: compact ? 12 : 14 }, max_lines: 1)
-  lock_icon = icon(icon: state[:editable] ? Ruflet::MaterialIcons[:edit] : Ruflet::MaterialIcons[:lock], color: MUTED, size: 20)
+  lock_icon = icon(icon: state[:editable] ? "edit" : "lock", color: MUTED, size: 20)
   run_button = nil
   editor = code_editor(
     state[:code],
@@ -1112,14 +1112,14 @@ def code_pane(page, item)
     state[:editable] = true
     page.update(editor, read_only: false, autofocus: true)
     page.update(run_button, disabled: false)
-    page.update(lock_icon, icon: Ruflet::MaterialIcons[:edit], color: BLUE)
+    page.update(lock_icon, icon: "edit", color: BLUE)
     page.update(status, value: "Editing preview", style: { color: BLUE, size: compact ? 12 : 14 })
   end
   run_button = filled_button(
     height: 36,
     disabled: !state[:editable],
     content: row(tight: true, spacing: 6, children: [
-      icon(icon: Ruflet::MaterialIcons[:play_arrow], size: 18),
+      icon(icon: "play_arrow", size: 18),
       text("Run")
     ]),
     on_click: ->(_event) { run_editor_preview(page, item, status) }
@@ -1131,7 +1131,7 @@ def code_pane(page, item)
         lock_icon,
         status,
         container(expand: true, content: text("")),
-        *(compact ? [] : [outlined_button(content: row(spacing: 8, children: [icon(icon: Ruflet::MaterialIcons[:fork_right]), text("Fork")]), disabled: true)])
+        *(compact ? [] : [outlined_button(content: row(spacing: 8, children: [icon(icon: "fork_right"), text("Fork")]), disabled: true)])
       ])),
     gesture_detector(expand: true, on_double_tap: unlock, content: editor)
   ]))
@@ -1139,10 +1139,11 @@ end
 
 def preview_pane(page, item)
   host = preview_host(page, item)
-  # clip_behavior keeps overflowing previews (e.g. the animation's scattered
-  # shapes) inside the preview pane instead of bleeding over the code editor.
-  container(expand: true, bgcolor: "#12161a", clip_behavior: "hardEdge", content: column(expand: true, spacing: 0, children: [
-    container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24, clip_behavior: "hardEdge",
+  # NOTE: do NOT clip this pane — iOS platform-view previews (WebView, Video,
+  # Map, Camera) render blank under an ancestor clip. Overflow-prone previews
+  # (e.g. the animation) clip themselves instead.
+  container(expand: true, bgcolor: "#12161a", content: column(expand: true, spacing: 0, children: [
+    container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24,
       content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
         children: [host])),
     console_bar
@@ -1194,10 +1195,10 @@ end
 
 def console_bar
   container(height: 48, bgcolor: "#090c0f", padding: { left: 14, right: 10 }, content: row(spacing: 12, children: [
-    icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: TEXT),
+    icon(icon: "chevron_right", color: TEXT),
     text("Console", style: { color: TEXT, size: 14, weight: "w700" }),
     container(expand: true, content: text("")),
-    icon(icon: Ruflet::MaterialIcons[:delete_outline], color: "#60656d")
+    icon(icon: "delete_outline", color: "#60656d")
   ]))
 end
 
@@ -1324,7 +1325,7 @@ def compact_game_thumbnail
     marked = (index % 5).zero?
     container(width: 24, height: 24, border_radius: 3,
       bgcolor: marked ? "#ef4444" : "#cbd5e1", alignment: "center",
-      content: marked ? icon(icon: Ruflet::MaterialIcons[:flag], color: "#ffffff", size: 11) : nil)
+      content: marked ? icon(icon: "flag", color: "#ffffff", size: 11) : nil)
   end
   column(tight: true, spacing: 4, children: cells.each_slice(4).map do |slice|
     row(tight: true, spacing: 4, children: slice)
@@ -1333,7 +1334,7 @@ end
 
 def compact_rive_thumbnail
   column(tight: true, horizontal_alignment: "center", spacing: 8, children: [
-    icon(icon: Ruflet::MaterialIcons[:directions_car], color: "#2563eb", size: 52),
+    icon(icon: "directions_car", color: "#2563eb", size: 52),
     row(tight: true, spacing: 5,
       children: Array.new(5) { container(width: 24, height: 4, border_radius: 2, bgcolor: "#94a3b8") })
   ])
@@ -1355,7 +1356,7 @@ def compact_media_thumbnail(item)
 end
 
 def compact_feature_thumbnail(item)
-  icon_value = CATEGORY_ICON[item[:category]] || Ruflet::MaterialIcons::CODE
+  icon_value = CATEGORY_ICON[item[:category]] || "code"
   column(tight: true, horizontal_alignment: "center", spacing: 10, children: [
     icon(icon: icon_value, color: "#2563eb", size: 40),
     container(width: 150, height: 8, border_radius: 4, bgcolor: "#cbd5e1"),
@@ -1565,7 +1566,7 @@ end
 def static_icons_thumbnail
   column(spacing: 8, children: [
     container(height: 26, border: { width: 1, color: "#9ca3af" }, content: text("  add", style: { color: "#111827", size: 10 })),
-    row(spacing: 16, children: [Ruflet::MaterialIcons::ADD, Ruflet::MaterialIcons::PHOTO_CAMERA, Ruflet::MaterialIcons[:alarm], Ruflet::MaterialIcons[:accessibility]].map { |i| icon(icon: i, color: "#446b9e", size: 20) })
+    row(spacing: 16, children: ["add", "photo_camera", "alarm", "accessibility"].map { |i| icon(icon: i, color: "#446b9e", size: 20) })
   ])
 end
 
@@ -1663,7 +1664,7 @@ end
 def icons_preview
   column(spacing: 10, children: [
     container(height: 30, border: { width: 1, color: "#9ca3af" }, content: text("  add", style: { color: "#111827" })),
-    row(spacing: 16, children: [Ruflet::MaterialIcons::ADD, Ruflet::MaterialIcons::PHOTO_CAMERA, Ruflet::MaterialIcons[:alarm], Ruflet::MaterialIcons[:accessibility]].map { |i| icon(icon: i, color: "#446b9e") })
+    row(spacing: 16, children: ["add", "photo_camera", "alarm", "accessibility"].map { |i| icon(icon: i, color: "#446b9e") })
   ])
 end
 
@@ -1694,7 +1695,7 @@ def settings_view(page, tab)
 
   control(:view, route: route_path(page), bgcolor: BG, padding: 0,
     appbar: app_bar(bgcolor: BAR, color: TEXT,
-      leading: icon_button(icon: Ruflet::MaterialIcons::CLOSE, on_click: ->(_e) { studio_go(page, "/apps") }),
+      leading: icon_button(icon: "close", on_click: ->(_e) { studio_go(page, "/apps") }),
       title: text("Settings", style: { color: TEXT, size: 20, weight: "w700" })),
     children: [
       column(expand: true, spacing: 0, children: [

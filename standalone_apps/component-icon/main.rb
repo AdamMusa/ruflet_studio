@@ -16,9 +16,9 @@ Ruflet.run do |page|
       content: row(
         spacing: 12,
         children: [
-          icon(icon: Ruflet::MaterialIcons::HOME, color: "#74c0fc"),
-          icon(icon: Ruflet::MaterialIcons::SETTINGS, color: "#adb5bd"),
-          icon(icon: Ruflet::MaterialIcons::CHECK_CIRCLE, color: "#69db7c")
+          icon(icon: "home", color: "#74c0fc"),
+          icon(icon: "settings", color: "#adb5bd"),
+          icon(icon: "check_circle", color: "#69db7c")
         ]
       )
     )

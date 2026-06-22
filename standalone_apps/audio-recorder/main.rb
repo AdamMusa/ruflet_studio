@@ -1,18 +1,6 @@
 # frozen_string_literal: true
 
 require "ruflet"
-require "fileutils"
-
-def prepare_recorder_output_path(page, recording_path, status)
-  return true unless %w[macos linux windows].include?((page.client_details && page.client_details["platform"]).to_s)
-
-  FileUtils.mkdir_p(File.dirname(recording_path))
-  FileUtils.touch(recording_path)
-  true
-rescue StandardError => e
-  page.update(status, value: "Recording file prepare error: #{e.class}: #{e.message}")
-  false
-end
 
 Ruflet.run do |page|
   page.margin = 0
@@ -20,70 +8,57 @@ Ruflet.run do |page|
   page.title = "Audio Recorder"
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"
-  status = text(value: "", style: { size: 12, color: "#6b7280" })
-  recorder = page.audio_recorder(key: "studio_audio_recorder")
-  recording_path = nil
+
+  spinner = container(visible: false, height: 64, alignment: "center",
+                      content: spinkit(pulse: { color: "#ef4444", size: 56 }))
+  status = text(value: "Tap Record to start.", style: { size: 14, color: "#374151" })
+  record_button = nil
+  stop_button = nil
+
+  apply_state = lambda do |state|
+    recording = state == "recording"
+    page.update(spinner, visible: recording)
+    page.update(record_button, disabled: recording)
+    page.update(stop_button, disabled: !recording)
+    page.update(status, value: (
+      case state
+      when "recording" then "Recording…"
+      when "paused" then "Paused"
+      when "stopped" then "Stopped — recording saved."
+      else state.to_s
+      end
+    ))
+  end
+
+  # Use state_change events for feedback (no invoke-result dependency) and let
+  # the recorder default its output path on the device.
+  recorder = page.audio_recorder(
+    key: "studio_audio_recorder",
+    on_state_change: ->(event) { apply_state.call(event.data.to_s) }
+  )
+
+  record_button = filled_button(content: row(tight: true, spacing: 8, children: [
+    icon(icon: "mic"), text("Record")
+  ]), on_click: ->(_e) {
+    page.update(status, value: "Starting… allow microphone access if prompted.")
+    recorder.start_recording(configuration: { encoder: "aacLc" })
+  })
+  stop_button = outlined_button(disabled: true, content: row(tight: true, spacing: 8, children: [
+    icon(icon: "stop"), text("Stop")
+  ]), on_click: ->(_e) {
+    page.update(status, value: "Stopping…")
+    recorder.stop_recording
+  })
+
   page.add(
     container(
       expand: true,
       alignment: "center",
       padding: 24,
       content: column(
-        spacing: 8,
-        children: [
-          status,
-          row(
-            spacing: 8,
-            wrap: true,
-            children: [
-              text_button(content: text(value: "Permission"), on_click: ->(_e) {
-                recorder.has_permission(on_result: ->(result, error) {
-                  page.update(status, value: error ? "Recorder permission error: #{error}" : "Recorder microphone permission: #{result.inspect}")
-                })
-              }),
-              text_button(content: text(value: "Input devices"), on_click: ->(_e) {
-                recorder.get_input_devices(on_result: ->(result, error) {
-                  page.update(status, value: error ? "Devices error: #{error}" : "Devices: #{result.inspect}")
-                })
-              }),
-              text_button(content: text(value: "Start"), on_click: ->(_e) {
-                page.update(status, value: "Preparing recording path...")
-                page.get_application_documents_directory(on_result: ->(documents_dir, path_error) {
-                  if path_error || documents_dir.to_s.empty?
-                    page.update(status, value: "Recording path error: #{path_error || "documents directory unavailable"}")
-                    next
-                  end
-      
-                  recording_path = File.join(documents_dir.to_s, "showcase_recording.wav")
-                  next unless prepare_recorder_output_path(page, recording_path, status)
-      
-                  recorder.has_permission(on_result: ->(allowed, recorder_error) {
-                    if recorder_error
-                      page.update(status, value: "Recorder permission error: #{recorder_error}")
-                    elsif !allowed
-                      page.update(status, value: "Recorder microphone permission was not granted.")
-                    else
-                      page.update(status, value: "Recording to #{recording_path}")
-                      recorder.start_recording(output_path: recording_path, configuration: { encoder: "wav" }, on_result: ->(result, error) {
-                        page.update(status, value: error ? "Start error: #{error}" : "Recording started: #{result.inspect}")
-                      })
-                    end
-                  })
-                })
-              }),
-              text_button(content: text(value: "Stop"), on_click: ->(_e) {
-                recorder.stop_recording(on_result: ->(result, error) {
-                  page.update(status, value: error ? "Stop error: #{error}" : "Recording saved: #{result.inspect || recording_path || "unknown path"}")
-                })
-              }),
-              text_button(content: text(value: "Cancel"), on_click: ->(_e) {
-                recorder.cancel_recording(on_result: ->(result, error) {
-                  page.update(status, value: error ? "Cancel error: #{error}" : "Recording cancelled: #{result.inspect}")
-                })
-              })
-            ]
-          )
-        ]
+        horizontal_alignment: "center",
+        spacing: 20,
+        children: [spinner, status, row(alignment: "center", spacing: 12, children: [record_button, stop_button])]
       )
     )
   )

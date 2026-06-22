@@ -14,10 +14,10 @@ Ruflet.run do |page|
       alignment: "center",
       padding: 24,
       content: list_tile(
-        leading: icon(icon: Ruflet::MaterialIcons::INFO),
+        leading: icon(icon: "info"),
         title: text(value: "ListTile title"),
         subtitle: text(value: "Subtitle"),
-        trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT)
+        trailing: icon(icon: "chevron_right")
       )
     )
   )

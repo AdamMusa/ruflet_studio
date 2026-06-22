@@ -25,7 +25,7 @@ Ruflet.run do |page|
             coordinates: center,
             width: 44,
             height: 44,
-            content: icon(icon: Ruflet::MaterialIcons::LOCATION_ON, color: "#ff5a5f")
+            content: icon(icon: "location_on", color: "#ff5a5f")
           )
         ]
       ),

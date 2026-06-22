@@ -25,7 +25,7 @@ Ruflet.run do |page|
             spacing: 12,
             horizontal_alignment: "center",
             children: [
-              icon(icon: Ruflet::MaterialIcons[:open_with], color: "#74c0fc", size: 48),
+              icon(icon: "open_with", color: "#74c0fc", size: 48),
               text(value: "Pinch, scroll, or drag", style: { size: 16, weight: "w700", color: "#111827" }),
               text(value: "InteractiveViewer content", style: { size: 13, color: "#6b7280" })
             ]

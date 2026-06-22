@@ -19,7 +19,7 @@ Ruflet.run do |page|
         spacing: 8,
         horizontal_alignment: Ruflet::CrossAxisAlignment::CENTER,
         children: [
-          icon(icon: Ruflet::MaterialIcons::PHOTO_CAMERA, color: "#374151"),
+          icon(icon: "photo_camera", color: "#374151"),
           text(value: "Capture area", style: { size: 18, color: "#111827" }),
           text(value: "Wrapped by page.screenshot", style: { size: 13, color: "#6b7280" })
         ]

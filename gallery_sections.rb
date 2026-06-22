@@ -65,7 +65,7 @@ module Showcase
             row(
               spacing: 8,
               children: [
-                icon(Ruflet::MaterialIcons[:info_outline], size: 18, color: color_subtle(page)),
+                icon("info_outline", size: 18, color: color_subtle(page)),
                 text(value: title, style: { size: 15, weight: "w600" })
               ]
             ),
@@ -607,31 +607,31 @@ end
 module Showcase
   module SectionsControls
     SUPPORTED_COMPONENTS = [
-      { label: "Hello World", slug: "hello-world", icon: Ruflet::MaterialIcons::WAVING_HAND },
-      { label: "Text", slug: "text", icon: Ruflet::MaterialIcons::TEXT_FIELDS },
-      { label: "Button", slug: "button", icon: Ruflet::MaterialIcons::TOUCH_APP },
-      { label: "Container", slug: "container", icon: Ruflet::MaterialIcons::CROP_SQUARE },
-      { label: "Row", slug: "row", icon: Ruflet::MaterialIcons::VIEW_COLUMN },
-      { label: "Column", slug: "column", icon: Ruflet::MaterialIcons::VIEW_STREAM },
-      { label: "TextField", slug: "text-field", icon: Ruflet::MaterialIcons::EDIT },
-      { label: "Icon", slug: "icon", icon: Ruflet::MaterialIcons::STAR },
-      { label: "Image", slug: "image", icon: Ruflet::MaterialIcons::IMAGE },
-      { label: "Dialog", slug: "dialog", icon: Ruflet::MaterialIcons::OPEN_IN_NEW },
-      { label: "DatePicker", slug: "date-picker", icon: Ruflet::MaterialIcons[:calendar_today] },
-      { label: "DateRangePicker", slug: "date-range-picker", icon: Ruflet::MaterialIcons[:date_range] },
-      { label: "TimePicker", slug: "time-picker", icon: Ruflet::MaterialIcons[:schedule] },
-      { label: "DataTable", slug: "data-table", icon: Ruflet::MaterialIcons::TABLE_CHART },
-      { label: "Dropdown", slug: "dropdown", icon: Ruflet::MaterialIcons[:arrow_drop_down_circle] },
-      { label: "Checkbox", slug: "checkbox", icon: Ruflet::MaterialIcons[:check_box] },
-      { label: "Radio", slug: "radio", icon: Ruflet::MaterialIcons[:radio_button_checked] },
-      { label: "Tabs", slug: "tabs", icon: Ruflet::MaterialIcons[:tab] },
-      { label: "ProgressBar", slug: "progress-bar", icon: Ruflet::MaterialIcons[:linear_scale] },
-      { label: "ProgressRing", slug: "progress-ring", icon: Ruflet::MaterialIcons[:donut_large] },
-      { label: "GridView", slug: "grid-view", icon: Ruflet::MaterialIcons[:grid_view] },
-      { label: "InteractiveViewer", slug: "interactive-viewer", icon: Ruflet::MaterialIcons[:open_with] },
-      { label: "ListTile", slug: "list-tile", icon: Ruflet::MaterialIcons::LIST },
-      { label: "Switch", slug: "switch", icon: Ruflet::MaterialIcons::TOGGLE_ON },
-      { label: "Slider", slug: "slider", icon: Ruflet::MaterialIcons::TUNE }
+      { label: "Hello World", slug: "hello-world", icon: "waving_hand" },
+      { label: "Text", slug: "text", icon: "text_fields" },
+      { label: "Button", slug: "button", icon: "touch_app" },
+      { label: "Container", slug: "container", icon: "crop_square" },
+      { label: "Row", slug: "row", icon: "view_column" },
+      { label: "Column", slug: "column", icon: "view_stream" },
+      { label: "TextField", slug: "text-field", icon: "edit" },
+      { label: "Icon", slug: "icon", icon: "star" },
+      { label: "Image", slug: "image", icon: "image" },
+      { label: "Dialog", slug: "dialog", icon: "open_in_new" },
+      { label: "DatePicker", slug: "date-picker", icon: "calendar_today" },
+      { label: "DateRangePicker", slug: "date-range-picker", icon: "date_range" },
+      { label: "TimePicker", slug: "time-picker", icon: "schedule" },
+      { label: "DataTable", slug: "data-table", icon: "table_chart" },
+      { label: "Dropdown", slug: "dropdown", icon: "arrow_drop_down_circle" },
+      { label: "Checkbox", slug: "checkbox", icon: "check_box" },
+      { label: "Radio", slug: "radio", icon: "radio_button_checked" },
+      { label: "Tabs", slug: "tabs", icon: "tab" },
+      { label: "ProgressBar", slug: "progress-bar", icon: "linear_scale" },
+      { label: "ProgressRing", slug: "progress-ring", icon: "donut_large" },
+      { label: "GridView", slug: "grid-view", icon: "grid_view" },
+      { label: "InteractiveViewer", slug: "interactive-viewer", icon: "open_with" },
+      { label: "ListTile", slug: "list-tile", icon: "list" },
+      { label: "Switch", slug: "switch", icon: "toggle_on" },
+      { label: "Slider", slug: "slider", icon: "tune" }
     ].freeze
 
     def build_components(page, status)
@@ -649,7 +649,7 @@ module Showcase
               content_padding: { left: 12, right: 12, top: 8, bottom: 8 },
               leading: icon(icon: component.fetch(:icon), color: color_icon(page)),
               title: text(value: component.fetch(:label), style: { size: 16, color: color_text(page) }),
-              trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT, color: color_subtle(page)),
+              trailing: icon(icon: "chevron_right", color: color_subtle(page)),
               on_click: ->(_e) { page.go("/components/#{slug}") }
             )
           end
@@ -728,9 +728,9 @@ module Showcase
         row(
           spacing: 12,
           children: [
-            icon(icon: Ruflet::MaterialIcons::HOME, color: "#74c0fc"),
-            icon(icon: Ruflet::MaterialIcons::SETTINGS, color: "#adb5bd"),
-            icon(icon: Ruflet::MaterialIcons::CHECK_CIRCLE, color: "#69db7c")
+            icon(icon: "home", color: "#74c0fc"),
+            icon(icon: "settings", color: "#adb5bd"),
+            icon(icon: "check_circle", color: "#69db7c")
           ]
         )
       when "image"
@@ -897,7 +897,7 @@ module Showcase
                   spacing: 6,
                   horizontal_alignment: "center",
                   children: [
-                    icon(icon: Ruflet::MaterialIcons[:widgets], color: "#9dccff"),
+                    icon(icon: "widgets", color: "#9dccff"),
                     text(value: "Item #{index}", style: { size: 13, color: color_text(page) })
                   ]
                 )
@@ -917,7 +917,7 @@ module Showcase
               spacing: 12,
               horizontal_alignment: "center",
               children: [
-                icon(icon: Ruflet::MaterialIcons[:open_with], color: "#74c0fc", size: 48),
+                icon(icon: "open_with", color: "#74c0fc", size: 48),
                 text(value: "Pinch, scroll, or drag", style: { size: 16, weight: "w700", color: color_text(page) }),
                 text(value: "InteractiveViewer content", style: { size: 13, color: color_subtle(page) })
               ]
@@ -933,10 +933,10 @@ module Showcase
       when "list-tile"
         control(
           :list_tile,
-          leading: icon(icon: Ruflet::MaterialIcons::INFO),
+          leading: icon(icon: "info"),
           title: text(value: "ListTile title"),
           subtitle: text(value: "Subtitle"),
-          trailing: icon(icon: Ruflet::MaterialIcons::CHEVRON_RIGHT)
+          trailing: icon(icon: "chevron_right")
         )
       when "switch"
         control(:switch, label: "Enabled", value: true, on_change: ->(_e) { page.update(status, value: "Switch changed") })
@@ -1128,7 +1128,7 @@ module Showcase
         control(
           :banner,
           open: true,
-          leading: icon(icon: Ruflet::MaterialIcons::INFO),
+          leading: icon(icon: "info"),
           content: text(value: "Backup completed successfully."),
           actions: [
             text_button(content: text(value: "Dismiss"), on_click: ->(_e) { page.pop_dialog })
@@ -1215,7 +1215,7 @@ module Showcase
               )
             )
           ),
-          control(:list_tile, leading: icon(icon: Ruflet::MaterialIcons::INFO), title: text(value: "ListTile"))
+          control(:list_tile, leading: icon(icon: "info"), title: text(value: "ListTile"))
         ]
       )
     end
@@ -1311,7 +1311,7 @@ module Showcase
             children: [
               checkbox_control,
               icon_button(
-                icon: Ruflet::MaterialIcons::DELETE,
+                icon: "delete",
                 tooltip: "Delete",
                 on_click: ->(_e) {
                   todos.delete_at(idx)
@@ -1514,8 +1514,13 @@ module Showcase
         page.update(status, value: scattered ? "Ruflet scattered." : "Ruflet assembled.")
       end
 
+      # Clip here (not on the shared preview pane) so the canvas's 3.4x scatter
+      # stays inside the animation, without clipping platform-view previews
+      # (WebView/Video/Map) whose iOS native views render blank under a clip.
       container(
+        expand: true,
         alignment: "center",
+        clip_behavior: "hardEdge",
         content: column(
           alignment: "center",
           horizontal_alignment: "center",
@@ -1671,64 +1676,58 @@ require "fileutils"
 module Showcase
   module SectionsMedia
     def build_audio_recorder(page, status)
-      recorder = page.audio_recorder(key: "studio_audio_recorder")
-      recording_path = nil
+      spinner = container(visible: false, height: 60, alignment: "center",
+                          content: spinkit(pulse: { color: "#ef4444", size: 52 }))
+      record_button = nil
+      stop_button = nil
+
+      apply_state = lambda do |state|
+        recording = state == "recording"
+        page.update(spinner, visible: recording)
+        page.update(record_button, disabled: recording)
+        page.update(stop_button, disabled: !recording)
+        label =
+          case state
+          when "recording" then "Recording…"
+          when "paused" then "Paused"
+          when "stopped" then "Stopped — recording saved."
+          else state.to_s
+          end
+        page.update(status, value: label)
+      end
+
+      # Drive the UI from state_change EVENTS (which round-trip in self-contained
+      # builds), not from invoke results. The recorder defaults its own output
+      # path on the device, so no storage-paths lookup (which would hang) is
+      # needed — just tap Record and allow microphone access.
+      recorder = page.audio_recorder(
+        key: "studio_audio_recorder",
+        on_state_change: ->(event) { apply_state.call(event.data.to_s) }
+      )
+
+      start = lambda do |_e|
+        page.update(status, value: "Starting… allow microphone access if prompted.")
+        recorder.start_recording(configuration: { encoder: "aacLc" })
+      end
+      stop = lambda do |_e|
+        page.update(status, value: "Stopping…")
+        recorder.stop_recording
+      end
+
+      record_button = filled_button(content: row(tight: true, spacing: 8, children: [
+        icon(icon: "mic"), text(value: "Record")
+      ]), on_click: start)
+      stop_button = outlined_button(disabled: true, content: row(tight: true, spacing: 8, children: [
+        icon(icon: "stop"), text(value: "Stop")
+      ]), on_click: stop)
 
       column(
-        spacing: 8,
+        spacing: 16,
+        horizontal_alignment: "center",
         children: [
+          spinner,
           status,
-          row(
-            spacing: 8,
-            wrap: true,
-            children: [
-              text_button(content: text(value: "Permission"), on_click: ->(_e) {
-                recorder.has_permission(on_result: ->(result, error) {
-                  page.update(status, value: error ? "Recorder permission error: #{error}" : "Recorder microphone permission: #{result.inspect}")
-                })
-              }),
-              text_button(content: text(value: "Input devices"), on_click: ->(_e) {
-                recorder.get_input_devices(on_result: ->(result, error) {
-                  page.update(status, value: error ? "Devices error: #{error}" : "Devices: #{result.inspect}")
-                })
-              }),
-              text_button(content: text(value: "Start"), on_click: ->(_e) {
-                page.update(status, value: "Preparing recording path...")
-                page.get_application_documents_directory(on_result: ->(documents_dir, path_error) {
-                  if path_error || documents_dir.to_s.empty?
-                    page.update(status, value: "Recording path error: #{path_error || "documents directory unavailable"}")
-                    next
-                  end
-
-                  recording_path = File.join(documents_dir.to_s, "showcase_recording.wav")
-                  next unless prepare_recorder_output_path(page, recording_path, status)
-
-                  recorder.has_permission(on_result: ->(allowed, recorder_error) {
-                    if recorder_error
-                      page.update(status, value: "Recorder permission error: #{recorder_error}")
-                    elsif !allowed
-                      page.update(status, value: "Recorder microphone permission was not granted.")
-                    else
-                      page.update(status, value: "Recording to #{recording_path}")
-                      recorder.start_recording(output_path: recording_path, configuration: { encoder: "wav" }, on_result: ->(result, error) {
-                        page.update(status, value: error ? "Start error: #{error}" : "Recording started: #{result.inspect}")
-                      })
-                    end
-                  })
-                })
-              }),
-              text_button(content: text(value: "Stop"), on_click: ->(_e) {
-                recorder.stop_recording(on_result: ->(result, error) {
-                  page.update(status, value: error ? "Stop error: #{error}" : "Recording saved: #{result.inspect || recording_path || "unknown path"}")
-                })
-              }),
-              text_button(content: text(value: "Cancel"), on_click: ->(_e) {
-                recorder.cancel_recording(on_result: ->(result, error) {
-                  page.update(status, value: error ? "Cancel error: #{error}" : "Recording cancelled: #{result.inspect}")
-                })
-              })
-            ]
-          )
+          row(alignment: "center", spacing: 12, children: [record_button, stop_button])
         ]
       )
     end
@@ -2208,7 +2207,7 @@ module Showcase
             children: [
               button(
                 content: "Pick files",
-                icon: Ruflet::MaterialIcons::UPLOAD_FILE,
+                icon: "upload_file",
                 on_click: ->(_e) do
                   next if picker_in_flight
                   picker_in_flight = true
@@ -2236,7 +2235,7 @@ module Showcase
             children: [
               button(
                 content: "Save file",
-                icon: Ruflet::MaterialIcons::SAVE,
+                icon: "save",
                 on_click: ->(_e) do
                   next if picker_in_flight
                   picker_in_flight = true
@@ -2266,7 +2265,7 @@ module Showcase
               children: [
                 button(
                   content: "Open directory",
-                  icon: Ruflet::MaterialIcons::FOLDER_OPEN,
+                  icon: "folder_open",
                   on_click: ->(_e) do
                     next if picker_in_flight
                     picker_in_flight = true
@@ -2489,7 +2488,7 @@ module Showcase
                 coordinates: center,
                 width: 44,
                 height: 44,
-                content: icon(icon: Ruflet::MaterialIcons::LOCATION_ON, color: "#ff5a5f")
+                content: icon(icon: "location_on", color: "#ff5a5f")
               )
             ]
           ),
@@ -2847,7 +2846,7 @@ module Showcase
             spacing: 8,
             horizontal_alignment: Ruflet::CrossAxisAlignment::CENTER,
             children: [
-              icon(icon: Ruflet::MaterialIcons::PHOTO_CAMERA, color: color_icon(page)),
+              icon(icon: "photo_camera", color: color_icon(page)),
               text(value: "Capture area", style: { size: 18, color: color_text(page) }),
               text(value: "Wrapped by page.screenshot", style: { size: 13, color: color_subtle(page) })
             ]
@@ -3386,18 +3385,23 @@ end
 # === showcase/sections_media/webview.rb ===
 module Showcase
   module SectionsMedia
-    def build_webview(page, _status)
+    def build_webview(page, status)
       # On the web the native webview becomes an <iframe>, which most sites
-      # (including ruflet.dev via X-Frame-Options) refuse to be embedded in.
+      # refuse to be embedded in (X-Frame-Options), so it's only shown natively.
       return unsupported_feature_panel(page, "WebView", "webview") unless feature_supported?(page, "webview")
 
       webview_height = preview_content_height(page, max: 640, min: 360)
+      # Use an embeddable, reliable URL, enable JS, and surface load/error state
+      # so a blank page is diagnosable rather than silent.
       webview_control = web_view(
-        url: "https://ruflet.dev/",
-        method: "get",
-        height: webview_height
+        url: "https://flet.dev",
+        enable_javascript: true,
+        height: webview_height,
+        on_page_started: ->(_e) { page.update(status, value: "Loading…") },
+        on_page_ended: ->(_e) { page.update(status, value: "Loaded") },
+        on_web_resource_error: ->(e) { page.update(status, value: "Load error: #{e.data}") }
       )
-      container(height: webview_height, content: webview_control)
+      column(spacing: 8, children: [status, container(height: webview_height, content: webview_control)])
     end
   end
 end

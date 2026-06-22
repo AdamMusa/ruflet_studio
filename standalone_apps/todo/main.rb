@@ -27,7 +27,7 @@ Ruflet.run do |page|
               on_change: ->(e) { item[:done] = [true, "true", "1", 1].include?(e.data) }
             ),
             icon_button(
-              icon: Ruflet::MaterialIcons::DELETE,
+              icon: "delete",
               on_click: ->(_e) { todos.delete_at(i); refresh.call }
             )
           ]
