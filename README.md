@@ -35,7 +35,9 @@ The same app, responsive on a phone:
 ## Requirements
 
 - Ruby 3.x and Bundler
-- The [Ruflet](https://github.com/AdamMusa/ruflet) toolchain (`ruflet` CLI). Run `ruflet doctor --fix` and it installs everything needed to build.
+- The [Ruflet](https://github.com/AdamMusa/ruflet) toolchain (`ruflet` CLI).
+
+To build distribution apps, run `ruflet doctor --fix` and it installs everything needed to build.
 
 ## Setup
 
