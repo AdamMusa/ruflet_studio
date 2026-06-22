@@ -16,6 +16,8 @@ def permission_handler_platform_notice(page)
 end
 
 Ruflet.run do |page|
+  page.margin = 0
+  page.padding = 0
   page.title = "Permission Handler"
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"

@@ -18,6 +18,8 @@ def format_brightness(value)
 end
 
 Ruflet.run do |page|
+  page.margin = 0
+  page.padding = 0
   page.title = "Screen Brightness"
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"

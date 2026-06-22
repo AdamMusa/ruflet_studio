@@ -3,6 +3,8 @@
 require "ruflet"
 
 Ruflet.run do |page|
+  page.margin = 0
+  page.padding = 0
   page.title = "Battery"
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"

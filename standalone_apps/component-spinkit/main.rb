@@ -3,6 +3,8 @@
 require "ruflet"
 
 Ruflet.run do |page|
+  page.margin = 0
+  page.padding = 0
   page.title = "SpinKit"
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"
@@ -44,30 +46,28 @@ Ruflet.run do |page|
   cells = []
   variants.each_with_index do |(variant, label), i|
     color = palette[i % palette.size]
-    cells << column(
+    # col: 4 of 12 => always 3 per row, cells flex to width (never clipped).
+    cells << container(col: 4, content: column(
       horizontal_alignment: "center",
       spacing: 8,
       children: [
-        container(height: 52, width: 96, alignment: "center",
+        container(height: 52, alignment: "center",
                   content: spinkit(variant => { color: color, size: 38 })),
         text(label, style: { size: 11, color: "#64748b" })
       ]
-    )
-  end
-
-  rows = []
-  i = 0
-  while i < cells.size
-    rows << row(alignment: "center", spacing: 18, run_spacing: 18, children: cells[i, 5])
-    i += 5
+    ))
   end
 
   page.add(
     container(
       expand: true,
       padding: 24,
-      alignment: "center",
-      content: column(spacing: 20, horizontal_alignment: "center", scroll: "auto", children: rows)
+      content: column(
+        scroll: "auto",
+        children: [
+          responsive_row(columns: 12, spacing: 12, run_spacing: 22, children: cells)
+        ]
+      )
     )
   )
 end

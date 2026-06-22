@@ -5,6 +5,8 @@ require "tmpdir"
 require "fileutils"
 
 Ruflet.run do |page|
+  page.margin = 0
+  page.padding = 0
   page.title = "Clipboard"
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"

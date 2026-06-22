@@ -9,6 +9,8 @@ def invoke_studio_window(window, page, status, method_name, success_message)
 end
 
 Ruflet.run do |page|
+  page.margin = 0
+  page.padding = 0
   page.title = "Window"
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"

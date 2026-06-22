@@ -32,13 +32,9 @@ ORANGE = "#f7a12d"
 CATEGORIES = [
   ["Getting Started", "Build your first Ruflet app", Ruflet::MaterialIcons[:rocket_launch], "getting-started"],
   ["Layout", "Layout primitives and containers", Ruflet::MaterialIcons::VIEW_MODULE, "layout"],
-  ["Buttons", "Buttons and action controls", Ruflet::MaterialIcons[:smart_button], "buttons"],
-  ["Input", "Text fields and selection controls", Ruflet::MaterialIcons[:input], "input"],
+  ["Components", "Individual control demos", Ruflet::MaterialIcons[:widgets], "components"],
   ["Displays", "Text, images, and information controls", Ruflet::MaterialIcons::IMAGE, "displays"],
-  ["Dialogs", "Alerts and modal surfaces", Ruflet::MaterialIcons[:chat_bubble_outline], "dialogs"],
-  ["Navigation", "Routes, tabs, and app structure", Ruflet::MaterialIcons[:navigation], "navigation"],
   ["Charts", "Data visualization examples", Ruflet::MaterialIcons::SHOW_CHART, "charts"],
-  ["Declarative", "Declarative routing and app shells", Ruflet::MaterialIcons::CODE, "declarative"],
   ["Games", "Interactive game examples", Ruflet::MaterialIcons[:sports_esports], "games"],
   ["Animations", "Motion and state transitions", Ruflet::MaterialIcons[:animation], "animations"],
   ["Effects", "Visual effects and polish", Ruflet::MaterialIcons[:auto_awesome], "effects"],
@@ -361,11 +357,10 @@ SHOWCASE_ROUTES = [
   ["calculator", "Calculator", "getting-started", :build_calculator],
   ["code-editor", "Code Editor", "getting-started", :build_code_editor],
   ["responsive-row", "Responsive Row", "layout", :build_responsive_row],
-  ["spinkit", "SpinKit", "displays", :build_spinkit],
-  ["components", "Components", "layout", :build_components],
+  ["spinkit", "SpinKit", "components", :build_spinkit],
   ["drawing", "Drawing Tool", "effects", :build_drawing],
-  ["material", "Material controls", "buttons", :build_material_controls],
-  ["cupertino", "Cupertino controls", "buttons", :build_cupertino_controls],
+  ["material", "Material controls", "components", :build_material_controls],
+  ["cupertino", "Cupertino controls", "components", :build_cupertino_controls],
   ["charts", "Charts", "charts", :build_charts],
   ["minesweeper", "Minesweeper", "games", :build_minesweeper],
   ["icon-search", "Icon Search", "displays", :build_icon_search],
@@ -399,34 +394,6 @@ SHOWCASE_ROUTES = [
   ["file-picker", "File Picker", "media", :build_file_picker],
   ["window", "Window", "media", :build_window]
 ].freeze
-
-COMPONENT_CATEGORIES = {
-  "hello-world" => "getting-started",
-  "text" => "displays",
-  "button" => "buttons",
-  "container" => "layout",
-  "row" => "layout",
-  "column" => "layout",
-  "text-field" => "input",
-  "icon" => "displays",
-  "image" => "displays",
-  "dialog" => "dialogs",
-  "date-picker" => "input",
-  "date-range-picker" => "input",
-  "time-picker" => "input",
-  "data-table" => "layout",
-  "dropdown" => "input",
-  "checkbox" => "input",
-  "radio" => "input",
-  "tabs" => "navigation",
-  "progress-bar" => "displays",
-  "progress-ring" => "displays",
-  "grid-view" => "layout",
-  "interactive-viewer" => "effects",
-  "list-tile" => "layout",
-  "switch" => "input",
-  "slider" => "input"
-}.freeze
 
 def read_standalone_file(slug, file)
   absolute = File.join(STANDALONE_ROOT, slug, file)
@@ -468,7 +435,7 @@ def showcase_component_examples
     showcase_example(
       "component-#{component_slug}",
       component.fetch(:label),
-      COMPONENT_CATEGORIES.fetch(component_slug, "layout"),
+      "components",
       :build_component_detail,
       component_slug: component_slug
     )
@@ -480,7 +447,7 @@ def showcase_examples
 end
 
 def showcase_gallery_examples
-  showcase_route_examples
+  showcase_route_examples + showcase_component_examples
 end
 
 def selected_file(page, item)
@@ -727,6 +694,8 @@ def top_bar(page, title, back: nil, actions: [])
   app_bar(
     bgcolor: BAR,
     color: TEXT,
+    # iOS centers the title by default; keep it left-aligned next to the back button.
+    center_title: false,
     leading: back ? icon_button(icon: Ruflet::MaterialIcons::ARROW_BACK, on_click: ->(_e) { studio_go(page, back) }) : nil,
     title: title_control,
     actions: actions + [icon_button(icon: Ruflet::MaterialIcons[:account_circle], on_click: ->(_e) { studio_go(page, "/settings/system") })]
@@ -974,11 +943,11 @@ end
 def category_view(page, slug)
   category = CATEGORIES.find { |item| item[3] == slug } || CATEGORIES.first
   rows = examples_for(slug)
+  # Title lives in the (left-aligned) appbar; only a short description stays in
+  # the body so the heading isn't duplicated.
   children = [
-    container(padding: { top: 22, left: 20, right: 20, bottom: 8 }, content: column(spacing: 14, children: [
-      text(category[0], style: { color: TEXT, size: 16, weight: "w700" }),
-      text(category[1], style: { color: MUTED, size: 14 })
-    ])),
+    container(padding: { top: 14, left: 20, right: 20, bottom: 8 },
+              content: text(category[1], style: { color: MUTED, size: 14 })),
     *rows.map { |item| example_row(page, item, slug) }
   ]
   control(:view, route: route_path(page), bgcolor: BG, padding: 0, appbar: top_bar(page, category[0], back: "/gallery"),
@@ -1170,8 +1139,10 @@ end
 
 def preview_pane(page, item)
   host = preview_host(page, item)
-  container(expand: true, bgcolor: "#12161a", content: column(expand: true, spacing: 0, children: [
-    container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24,
+  # clip_behavior keeps overflowing previews (e.g. the animation's scattered
+  # shapes) inside the preview pane instead of bleeding over the code editor.
+  container(expand: true, bgcolor: "#12161a", clip_behavior: "hardEdge", content: column(expand: true, spacing: 0, children: [
+    container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24, clip_behavior: "hardEdge",
       content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
         children: [host])),
     console_bar

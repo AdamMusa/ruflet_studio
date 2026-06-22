@@ -627,7 +627,6 @@ module Showcase
       { label: "Tabs", slug: "tabs", icon: Ruflet::MaterialIcons[:tab] },
       { label: "ProgressBar", slug: "progress-bar", icon: Ruflet::MaterialIcons[:linear_scale] },
       { label: "ProgressRing", slug: "progress-ring", icon: Ruflet::MaterialIcons[:donut_large] },
-      { label: "SpinKit", slug: "spinkit", icon: Ruflet::MaterialIcons[:autorenew] },
       { label: "GridView", slug: "grid-view", icon: Ruflet::MaterialIcons[:grid_view] },
       { label: "InteractiveViewer", slug: "interactive-viewer", icon: Ruflet::MaterialIcons[:open_with] },
       { label: "ListTile", slug: "list-tile", icon: Ruflet::MaterialIcons::LIST },
@@ -4240,26 +4239,25 @@ module Showcase
     ].freeze
 
     # A labelled grid of every SpinKit variant. Shared by the Apps gallery card
-    # (build_spinkit) and the Components > SpinKit detail.
-    def spinkit_gallery(page, per_row: 5)
+    # (build_spinkit) and the Components > SpinKit detail. Uses a wrapping row so
+    # every variant is visible at any width (narrow phones wrap to more runs
+    # instead of clipping columns off the right edge).
+    def spinkit_gallery(page)
       cells = SPINKIT_VARIANTS_SHOWCASE.each_with_index.map do |(variant, label), index|
         color = SPINKIT_PALETTE[index % SPINKIT_PALETTE.size]
-        column(
+        # col: 4 of 12 => always 3 per row, cells flex to width (never clipped).
+        container(col: 4, content: column(
           horizontal_alignment: "center",
           spacing: 8,
           children: [
-            container(height: 52, width: 90, alignment: "center",
+            container(height: 52, alignment: "center",
                       content: spinkit(variant => { color: color, size: 38 })),
             text(value: label, style: { size: 11, color: color_subtle(page) })
           ]
-        )
+        ))
       end
 
-      rows = cells.each_slice(per_row).map do |slice|
-        row(alignment: "center", spacing: 18, run_spacing: 18, children: slice)
-      end
-
-      column(spacing: 20, horizontal_alignment: "center", children: rows)
+      responsive_row(columns: 12, spacing: 12, run_spacing: 22, children: cells)
     end
 
     def build_spinkit(page, status)
