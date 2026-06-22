@@ -11,12 +11,10 @@ Ruflet.run do |page|
 
   status = text(value: "Loading…", style: { size: 12, color: "#6b7280" })
 
-  # Give the WebView the full area (no surrounding padding that would collapse
-  # its height), enable JavaScript, and surface load/error state so a blank page
-  # is diagnosable instead of silent.
+  # Same call the working showcase uses; surface load/error state too.
   webview_control = web_view(
-    url: "https://flet.dev",
-    enable_javascript: true,
+    url: "https://ruflet.dev/",
+    method: "get",
     expand: true,
     on_page_started: ->(_e) { page.update(status, value: "Loading…") },
     on_page_ended: ->(_e) { page.update(status, value: "Loaded") },

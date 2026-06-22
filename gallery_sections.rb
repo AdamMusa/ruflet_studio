@@ -1676,42 +1676,57 @@ require "fileutils"
 module Showcase
   module SectionsMedia
     def build_audio_recorder(page, status)
+      recorder = page.audio_recorder(key: "studio_audio_recorder")
+      recording_path = nil
+
       spinner = container(visible: false, height: 60, alignment: "center",
                           content: spinkit(pulse: { color: "#ef4444", size: 52 }))
       record_button = nil
       stop_button = nil
 
-      apply_state = lambda do |state|
-        recording = state == "recording"
+      set_recording = lambda do |recording|
         page.update(spinner, visible: recording)
         page.update(record_button, disabled: recording)
         page.update(stop_button, disabled: !recording)
-        label =
-          case state
-          when "recording" then "Recording…"
-          when "paused" then "Paused"
-          when "stopped" then "Stopped — recording saved."
-          else state.to_s
-          end
-        page.update(status, value: label)
       end
 
-      # Drive the UI from state_change EVENTS (which round-trip in self-contained
-      # builds), not from invoke results. The recorder defaults its own output
-      # path on the device, so no storage-paths lookup (which would hang) is
-      # needed — just tap Record and allow microphone access.
-      recorder = page.audio_recorder(
-        key: "studio_audio_recorder",
-        on_state_change: ->(event) { apply_state.call(event.data.to_s) }
-      )
-
+      # Pure Ruby: resolve a writable path, then record to it (same flow as the
+      # showcase reference). No client/Dart changes.
       start = lambda do |_e|
-        page.update(status, value: "Starting… allow microphone access if prompted.")
-        recorder.start_recording(configuration: { encoder: "aacLc" })
+        page.update(status, value: "Preparing recording…")
+        page.get_application_documents_directory(on_result: ->(documents_dir, path_error) {
+          if path_error || documents_dir.to_s.empty?
+            page.update(status, value: "Recording path error: #{path_error || "documents directory unavailable"}")
+            next
+          end
+
+          recording_path = File.join(documents_dir.to_s, "showcase_recording.wav")
+          next unless prepare_recorder_output_path(page, recording_path, status)
+
+          recorder.has_permission(on_result: ->(allowed, recorder_error) {
+            if recorder_error
+              page.update(status, value: "Recorder permission error: #{recorder_error}")
+            elsif !allowed
+              page.update(status, value: "Microphone permission was not granted.")
+            else
+              set_recording.call(true)
+              page.update(status, value: "Recording → #{recording_path}")
+              recorder.start_recording(output_path: recording_path, configuration: { encoder: "wav" }, on_result: ->(_result, error) {
+                if error
+                  set_recording.call(false)
+                  page.update(status, value: "Start error: #{error}")
+                end
+              })
+            end
+          })
+        })
       end
+
       stop = lambda do |_e|
-        page.update(status, value: "Stopping…")
-        recorder.stop_recording
+        recorder.stop_recording(on_result: ->(result, error) {
+          set_recording.call(false)
+          page.update(status, value: error ? "Stop error: #{error}" : "Saved: #{result.inspect || recording_path || "unknown path"}")
+        })
       end
 
       record_button = filled_button(content: row(tight: true, spacing: 8, children: [
@@ -3391,11 +3406,10 @@ module Showcase
       return unsupported_feature_panel(page, "WebView", "webview") unless feature_supported?(page, "webview")
 
       webview_height = preview_content_height(page, max: 640, min: 360)
-      # Use an embeddable, reliable URL, enable JS, and surface load/error state
-      # so a blank page is diagnosable rather than silent.
+      # Same call the working showcase uses; surface load/error state too.
       webview_control = web_view(
-        url: "https://flet.dev",
-        enable_javascript: true,
+        url: "https://ruflet.dev/",
+        method: "get",
         height: webview_height,
         on_page_started: ->(_e) { page.update(status, value: "Loading…") },
         on_page_ended: ->(_e) { page.update(status, value: "Loaded") },
