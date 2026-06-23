@@ -1030,9 +1030,16 @@ end
 
 def mobile_preview_pane(page, item)
   host = preview_host(page, item)
-  container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 14,
-    content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
-      children: [host]))
+  if FILL_PREVIEW_SLUGS.include?(item[:slug])
+    # Platform views need a BOUNDED height. A scroll view hands them unbounded
+    # height, which makes the native view's layer infinite/NaN and crashes the
+    # app (CALayerInvalidGeometry). Give them the full pane, no scroll.
+    container(expand: true, bgcolor: PREVIEW_SURFACE, content: host)
+  else
+    container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 14, clip_behavior: "hardEdge",
+      content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
+        children: [host]))
+  end
 end
 
 def mobile_workspace_tab(page, label, icon_value, tab_key, selected)
