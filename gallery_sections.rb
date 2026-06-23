@@ -3408,7 +3408,7 @@ module Showcase
       webview_height = preview_content_height(page, max: 640, min: 360)
       # Same call the working showcase uses; surface load/error state too.
       webview_control = web_view(
-        url: "https://ruflet.dev/",
+        url: "https://rubyonrails.org",
         method: "get",
         height: webview_height,
         on_page_started: ->(_e) { page.update(status, value: "Loading…") },

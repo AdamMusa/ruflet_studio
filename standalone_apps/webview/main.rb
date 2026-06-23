@@ -8,7 +8,7 @@ Ruflet.run do |page|
 
   # Exact same code as the showcase webview section.
   webview_control = web_view(
-    url: "https://ruflet.dev/",
+    url: "https://rubyonrails.org",
     method: "get",
     expand: true
   )
