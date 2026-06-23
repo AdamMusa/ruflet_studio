@@ -1137,36 +1137,55 @@ def code_pane(page, item)
   ]))
 end
 
+# Examples whose preview is a native platform view. These must NOT be clipped
+# OR placed inside a scroll view: a platform view composited under a scroll/clip
+# transform paints with an invalid matrix and renders blank (the WebView "blank
+# preview" bug). They get the full pane, no padding, no scroll.
+FILL_PREVIEW_SLUGS = %w[webview video map camera].freeze
+
 def preview_pane(page, item)
   host = preview_host(page, item)
-  # NOTE: do NOT clip this pane — iOS platform-view previews (WebView, Video,
-  # Map, Camera) render blank under an ancestor clip. Overflow-prone previews
-  # (e.g. the animation) clip themselves instead.
+  inner =
+    if FILL_PREVIEW_SLUGS.include?(item[:slug])
+      container(expand: true, bgcolor: PREVIEW_SURFACE, content: host)
+    else
+      container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24,
+        content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
+          children: [host]))
+    end
   container(expand: true, bgcolor: "#12161a", content: column(expand: true, spacing: 0, children: [
-    container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24,
-      content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
-        children: [host])),
+    inner,
     console_bar
   ]))
 end
 
 def preview_host(page, item)
+  fill = FILL_PREVIEW_SLUGS.include?(item[:slug])
   state = editor_session(page, item, "main.rb")
   unless state[:preview]
     state[:preview] = render_example_code(page, state[:code], session: state)
     state[:last_successful_preview] = state[:preview]
   end
-  host = container(alignment: { x: -1, y: -1 },
-    content: state[:preview])
+  host = preview_host_container(fill, state[:preview])
   state[:preview_host] = host
   host
 rescue Exception # User-authored source can raise SyntaxError or SystemExit.
   fallback = state[:last_successful_preview] || preview_for(page, item[:slug], large: true)
   state[:preview] = fallback
   state[:last_successful_preview] = fallback
-  host = container(alignment: { x: -1, y: -1 }, content: fallback)
+  host = preview_host_container(fill, fallback)
   state[:preview_host] = host
   host
+end
+
+# Platform-view previews fill the pane; everything else hugs the top-left so
+# scrollable content lays out naturally.
+def preview_host_container(fill, content)
+  if fill
+    container(expand: true, content: content)
+  else
+    container(alignment: { x: -1, y: -1 }, content: content)
+  end
 end
 
 # "Run" evaluates the current source string and replaces the preview host.
