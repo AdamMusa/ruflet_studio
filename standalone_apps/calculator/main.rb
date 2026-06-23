@@ -180,7 +180,6 @@ rescue StandardError
 end
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Calculator"
   page.theme_mode = "system"

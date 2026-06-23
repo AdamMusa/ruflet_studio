@@ -31,7 +31,6 @@ SUPPORTED_COMPONENTS = [
 ].freeze
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Components"
   page.theme_mode = "system"

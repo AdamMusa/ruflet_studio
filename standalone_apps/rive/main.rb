@@ -5,7 +5,6 @@ require "ruflet"
 RIVE_SAMPLE_SRC = "https://cdn.rive.app/animations/vehicles.riv"
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Rive"
   page.theme_mode = "system"

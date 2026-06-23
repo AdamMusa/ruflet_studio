@@ -4,7 +4,6 @@ require "fileutils"
 require "ruflet"
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Audio Recorder"
   page.theme_mode = "system"

@@ -12,7 +12,6 @@ SAMPLE_CODE = <<~RUBY
 RUBY
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Code Editor"
   page.theme_mode = "system"

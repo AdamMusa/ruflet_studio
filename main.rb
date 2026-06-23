@@ -1147,9 +1147,13 @@ def preview_pane(page, item)
   host = preview_host(page, item)
   inner =
     if FILL_PREVIEW_SLUGS.include?(item[:slug])
+      # Platform views must NOT be clipped (a clip ancestor blanks them).
       container(expand: true, bgcolor: PREVIEW_SURFACE, content: host)
     else
-      container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24,
+      # Everything else is clipped to the pane so overflow-heavy previews (e.g.
+      # the animation's scattered, absolutely-positioned shapes) can't bleed
+      # into the code pane.
+      container(expand: true, bgcolor: PREVIEW_SURFACE, padding: 24, clip_behavior: "hardEdge",
         content: column(expand: true, scroll: "auto", horizontal_alignment: "stretch",
           children: [host]))
     end
@@ -1182,10 +1186,17 @@ end
 # scrollable content lays out naturally.
 def preview_host_container(fill, content)
   if fill
-    container(expand: true, content: content)
+    container(expand: true, content: fill_preview_body(content))
   else
     container(alignment: { x: -1, y: -1 }, content: content)
   end
+end
+
+# A platform-view example's root uses expand:true, which only takes effect
+# inside a flex parent. Host it in an expanding column (like a real app page)
+# so the native view fills the pane instead of collapsing to zero height.
+def fill_preview_body(content)
+  column(expand: true, horizontal_alignment: "stretch", children: [content])
 end
 
 # "Run" evaluates the current source string and replaces the preview host.
@@ -1201,7 +1212,8 @@ def run_editor_preview(page, item, status)
   if mobile?(page)
     studio_go(page, tab_route(page, "preview"))
   elsif state[:preview_host]
-    page.update(state[:preview_host], content: rendered)
+    body = FILL_PREVIEW_SLUGS.include?(item[:slug]) ? fill_preview_body(rendered) : rendered
+    page.update(state[:preview_host], content: body)
   end
 rescue Exception => error # User-authored source can raise SyntaxError or SystemExit.
   state[:preview] = state[:last_successful_preview] if state

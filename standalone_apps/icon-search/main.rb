@@ -58,7 +58,6 @@ rescue NameError
 end
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Icon Search"
   page.theme_mode = "system"

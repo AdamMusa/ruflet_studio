@@ -12,7 +12,6 @@ def component_chip(label)
 end
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Column"
   page.theme_mode = "system"

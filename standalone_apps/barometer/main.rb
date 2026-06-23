@@ -9,7 +9,6 @@ def barometer_reading_label(data)
 end
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Barometer"
   page.theme_mode = "system"

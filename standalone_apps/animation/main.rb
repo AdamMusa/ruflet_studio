@@ -3,7 +3,6 @@
 require "ruflet"
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "Ruflet Animation"
   page.theme_mode = "system"
@@ -11,8 +10,10 @@ Ruflet.run do |page|
   status = text(value: "", style: { size: 12, color: "#6b7280" })
   random = Random.new
   scattered = true
-  size = 14
-  gap = 4
+  # Keep the assembled word narrow enough to fit a phone width (and the editor
+  # preview pane) without clipping the final "t".
+  size = 7
+  gap = 2
   duration = 2_000
   letter_gap = 2
   colors = ["#ec5f94", "#ffa000", "#5bd46f", "#7c4dff", "#42a5f5", "#ffd43b"]

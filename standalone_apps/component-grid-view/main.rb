@@ -3,7 +3,6 @@
 require "ruflet"
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "GridView"
   page.theme_mode = "system"

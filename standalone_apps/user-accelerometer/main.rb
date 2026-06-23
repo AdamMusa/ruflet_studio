@@ -15,7 +15,6 @@ def sensor_reading_label(data)
 end
 
 Ruflet.run do |page|
-  page.margin = 0
   page.padding = 0
   page.title = "User Accelerometer"
   page.theme_mode = "system"
