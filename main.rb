@@ -891,11 +891,11 @@ def mobile_gallery_menu(page)
   ])
 end
 
-def gallery_back_bar(page, title)
+def gallery_back_bar(page, _title = nil)
+  # Just a left-aligned back arrow — the shell app bar already shows the title.
   container(height: 48, bgcolor: BG, padding: { left: 4, right: 12 },
-    content: row(alignment: "center", spacing: 2, children: [
-      icon_button(icon: "arrow_back", on_click: ->(_e) { studio_go(page, "/gallery") }),
-      text(title, style: { color: TEXT, size: 16, weight: "w700" })
+    content: row(alignment: "start", spacing: 2, children: [
+      icon_button(icon: "arrow_back", on_click: ->(_e) { studio_go(page, "/gallery") })
     ]))
 end
 
