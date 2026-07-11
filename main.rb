@@ -738,9 +738,9 @@ def nav_rail(page, active)
 end
 
 def rail_item(page, label, icon_value, route, selected)
-  container(padding: { left: 6, right: 6 }, content: column(horizontal_alignment: "center", spacing: 3, children: [
+  container(padding: { left: 6, right: 6 }, on_click: ->(_e) { studio_go(page, route) }, content: column(horizontal_alignment: "center", spacing: 3, children: [
     container(width: 46, height: 36, border_radius: 18, bgcolor: selected ? PINK : BG, alignment: "center",
-      on_click: ->(_e) { studio_go(page, route) }, content: icon(icon: icon_value, color: selected ? "#ffffff" : MUTED, size: 22)),
+      content: icon(icon: icon_value, color: selected ? "#ffffff" : MUTED, size: 22)),
     text(label, style: { color: selected ? TEXT : MUTED, size: 12, weight: selected ? "w700" : "w600" })
   ]))
 end
