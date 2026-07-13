@@ -1029,8 +1029,8 @@ def mobile_editor_workspace(page, item)
 end
 
 def mobile_preview_pane(page, item)
-  host = preview_host(page, item)
-  if FILL_PREVIEW_SLUGS.include?(item[:slug])
+  host, fill = preview_host(page, item)
+  if fill
     # Platform views need a BOUNDED height. A scroll view hands them unbounded
     # height, which makes the native view's layer infinite/NaN and crashes the
     # app (CALayerInvalidGeometry). Give them the full pane, no scroll.
@@ -1151,9 +1151,9 @@ end
 FILL_PREVIEW_SLUGS = %w[webview video map camera].freeze
 
 def preview_pane(page, item)
-  host = preview_host(page, item)
+  host, fill = preview_host(page, item)
   inner =
-    if FILL_PREVIEW_SLUGS.include?(item[:slug])
+    if fill
       # Platform views must NOT be clipped (a clip ancestor blanks them).
       container(expand: true, bgcolor: PREVIEW_SURFACE, content: host)
     else
@@ -1171,22 +1171,48 @@ def preview_pane(page, item)
 end
 
 def preview_host(page, item)
-  fill = FILL_PREVIEW_SLUGS.include?(item[:slug])
   state = editor_session(page, item, "main.rb")
   unless state[:preview]
     state[:preview] = render_example_code(page, state[:code], session: state)
     state[:last_successful_preview] = state[:preview]
   end
+  fill = preview_requires_bounded_host?(item, state[:preview])
   host = preview_host_container(fill, state[:preview])
   state[:preview_host] = host
-  host
+  state[:preview_fill] = fill
+  [host, fill]
 rescue Exception # User-authored source can raise SyntaxError or SystemExit.
   fallback = state[:last_successful_preview] || preview_for(page, item[:slug], large: true)
   state[:preview] = fallback
   state[:last_successful_preview] = fallback
+  fill = preview_requires_bounded_host?(item, fallback)
   host = preview_host_container(fill, fallback)
   state[:preview_host] = host
-  host
+  state[:preview_fill] = fill
+  [host, fill]
+end
+
+# A self-contained app that uses flex expansion needs the same finite viewport
+# constraints it receives when run directly. Detect that from the rendered
+# control tree instead of maintaining per-example exceptions.
+def preview_requires_bounded_host?(item, content)
+  FILL_PREVIEW_SLUGS.include?(item[:slug]) || control_tree_expands?(content)
+end
+
+def control_tree_expands?(value)
+  case value
+  when Ruflet::Control
+    return true if value.props["expand"] && value.props["expand"] != false
+
+    value.children.any? { |child| control_tree_expands?(child) } ||
+      value.props.values.any? { |prop| control_tree_expands?(prop) }
+  when Array
+    value.any? { |entry| control_tree_expands?(entry) }
+  when Hash
+    value.values.any? { |entry| control_tree_expands?(entry) }
+  else
+    false
+  end
 end
 
 # Platform-view previews fill the pane; everything else hugs the top-left so
@@ -1219,7 +1245,9 @@ def run_editor_preview(page, item, status)
   if mobile?(page)
     studio_go(page, tab_route(page, "preview"))
   elsif state[:preview_host]
-    body = FILL_PREVIEW_SLUGS.include?(item[:slug]) ? fill_preview_body(rendered) : rendered
+    fill = preview_requires_bounded_host?(item, rendered)
+    state[:preview_fill] = fill
+    body = fill ? fill_preview_body(rendered) : rendered
     page.update(state[:preview_host], content: body)
   end
 rescue Exception => error # User-authored source can raise SyntaxError or SystemExit.
