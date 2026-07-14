@@ -38,7 +38,7 @@ CATEGORIES = [
   ["Games", "Interactive game examples", "sports_esports", "games"],
   ["Animations", "Motion and state transitions", "animation", "animations"],
   ["Effects", "Visual effects and polish", "auto_awesome", "effects"],
-  ["Media", "Media and platform integrations", "movie", "media"]
+  ["Services", "Device and platform integrations", "settings", "services"]
 ].freeze
 
 EXAMPLES = [
@@ -273,7 +273,7 @@ CONTROL_EXAMPLES = {
   "games" => ["TicTacToe", "Memory", "CounterGame"],
   "animations" => ["AnimatedContainer", "Fade", "Scale", "Slide"],
   "effects" => ["Shadow", "Gradient", "Blur", "Opacity"],
-  "media" => ["Audio", "Video", "Camera", "FilePicker"],
+  "services" => ["Audio", "AudioRecorder", "Map", "Camera", "FilePicker"],
   "getting-started" => []
 }.freeze
 
@@ -366,33 +366,33 @@ SHOWCASE_ROUTES = [
   ["icon-search", "Icon Search", "displays", :build_icon_search],
   ["animation", "Ruflet Animation", "animations", :build_animation],
   ["rive", "Rive", "animations", :build_rive],
-  ["accelerometer", "Accelerometer", "media", :build_accelerometer],
-  ["gyroscope", "Gyroscope", "media", :build_gyroscope],
-  ["user-accelerometer", "User Accelerometer", "media", :build_user_accelerometer],
-  ["magnetometer", "Magnetometer", "media", :build_magnetometer],
-  ["barometer", "Barometer", "media", :build_barometer],
-  ["browser-context-menu", "Browser Context Menu", "media", :build_browser_context_menu],
-  ["shake-detector", "Shake Detector", "media", :build_shake_detector],
-  ["semantics-service", "Semantics Service", "media", :build_semantics_service],
-  ["screenshot", "Screenshot", "media", :build_screenshot],
-  ["audio", "Audio Player", "media", :build_audio],
-  ["audio-recorder", "Audio Recorder", "media", :build_audio_recorder],
-  ["video", "Video Player", "media", :build_video],
-  ["battery", "Battery", "media", :build_battery],
-  ["screen-brightness", "Screen Brightness", "media", :build_screen_brightness],
-  ["clipboard", "Clipboard", "media", :build_clipboard],
-  ["storage-paths", "Storage Paths", "media", :build_storage_paths],
-  ["share", "Share", "media", :build_share],
-  ["webview", "WebView", "media", :build_webview],
-  ["flashlight", "Flashlight", "media", :build_flashlight],
-  ["connectivity", "Connectivity", "media", :build_connectivity],
-  ["geolocator", "Geolocator", "media", :build_geolocator],
-  ["map", "Map", "media", :build_map],
-  ["permission-handler", "Permission Handler", "media", :build_permission_handler],
-  ["secure-storage", "Secure Storage", "media", :build_secure_storage],
-  ["camera", "Camera", "media", :build_camera],
-  ["file-picker", "File Picker", "media", :build_file_picker],
-  ["window", "Window", "media", :build_window]
+  ["accelerometer", "Accelerometer", "services", :build_accelerometer],
+  ["gyroscope", "Gyroscope", "services", :build_gyroscope],
+  ["user-accelerometer", "User Accelerometer", "services", :build_user_accelerometer],
+  ["magnetometer", "Magnetometer", "services", :build_magnetometer],
+  ["barometer", "Barometer", "services", :build_barometer],
+  ["browser-context-menu", "Browser Context Menu", "services", :build_browser_context_menu],
+  ["shake-detector", "Shake Detector", "services", :build_shake_detector],
+  ["semantics-service", "Semantics Service", "services", :build_semantics_service],
+  ["screenshot", "Screenshot", "services", :build_screenshot],
+  ["audio", "Audio Player", "services", :build_audio],
+  ["audio-recorder", "Audio Recorder", "services", :build_audio_recorder],
+  ["video", "Video Player", "services", :build_video],
+  ["battery", "Battery", "services", :build_battery],
+  ["screen-brightness", "Screen Brightness", "services", :build_screen_brightness],
+  ["clipboard", "Clipboard", "services", :build_clipboard],
+  ["storage-paths", "Storage Paths", "services", :build_storage_paths],
+  ["share", "Share", "services", :build_share],
+  ["webview", "WebView", "services", :build_webview],
+  ["flashlight", "Flashlight", "services", :build_flashlight],
+  ["connectivity", "Connectivity", "services", :build_connectivity],
+  ["geolocator", "Geolocator", "services", :build_geolocator],
+  ["map", "Map", "services", :build_map],
+  ["permission-handler", "Permission Handler", "services", :build_permission_handler],
+  ["secure-storage", "Secure Storage", "services", :build_secure_storage],
+  ["camera", "Camera", "services", :build_camera],
+  ["file-picker", "File Picker", "services", :build_file_picker],
+  ["window", "Window", "services", :build_window]
 ].freeze
 
 def read_standalone_file(slug, file)
@@ -528,8 +528,8 @@ class StudioPreviewPage
     @controls = []
   end
 
-  def add(*controls)
-    @controls.concat(controls.flatten.compact)
+  def add(control)
+    @controls << control unless control.nil?
     self
   end
 
@@ -1297,7 +1297,7 @@ def showcase_thumbnail(item)
   return static_flet_logo_thumbnail if slug == "animation"
   return compact_rive_thumbnail if slug == "rive"
   return compact_spinkit_thumbnail if slug == "spinkit"
-  return compact_media_thumbnail(item) if item[:category] == "media"
+  return compact_services_thumbnail(item) if item[:category] == "services"
   return static_control_thumbnail(item[:slug]) if item[:component_slug]
 
   compact_feature_thumbnail(item)
@@ -1406,7 +1406,7 @@ def compact_rive_thumbnail
   ])
 end
 
-def compact_media_thumbnail(item)
+def compact_services_thumbnail(item)
   icons = {
     "audio" => :audiotrack, "audio-recorder" => :mic, "video" => :play_circle,
     "camera" => :photo_camera, "map" => :map, "geolocator" => :location_on,

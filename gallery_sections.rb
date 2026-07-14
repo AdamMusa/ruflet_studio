@@ -2538,10 +2538,10 @@ module Showcase
                 map_control.center_on(center, zoom: 13)
               }),
               text_button(content: text(value: "Zoom in"), on_click: ->(_e) {
-                map_control.zoom_in(delta: 1)
+                map_control.zoom_in
               }),
               text_button(content: text(value: "Zoom out"), on_click: ->(_e) {
-                map_control.zoom_out(delta: 1)
+                map_control.zoom_out
               })
             ]
           ),
@@ -2851,7 +2851,7 @@ module Showcase
   module SectionsMedia
     def build_screenshot(page, _status)
       status_text = text(value: "Screenshot control registered.")
-      capture_area = page.screenshot(
+      capture_area = screenshot(
         tooltip: "Screenshot area",
         content: container(
           width: 260,
@@ -2863,7 +2863,7 @@ module Showcase
             children: [
               icon(icon: "photo_camera", color: color_icon(page)),
               text(value: "Capture area", style: { size: 18, color: color_text(page) }),
-              text(value: "Wrapped by page.screenshot", style: { size: 13, color: color_subtle(page) })
+              text(value: "Wrapped by screenshot", style: { size: 13, color: color_subtle(page) })
             ]
           )
         )

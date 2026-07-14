@@ -8,7 +8,7 @@ Ruflet.run do |page|
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"
   status_text = text(value: "Screenshot control registered.")
-  capture_area = page.screenshot(
+  capture_area = screenshot(
     tooltip: "Screenshot area",
     content: container(
       width: 260,
@@ -20,7 +20,7 @@ Ruflet.run do |page|
         children: [
           icon(icon: "photo_camera", color: "#374151"),
           text(value: "Capture area", style: { size: 18, color: "#111827" }),
-          text(value: "Wrapped by page.screenshot", style: { size: 13, color: "#6b7280" })
+          text(value: "Wrapped by screenshot", style: { size: 13, color: "#6b7280" })
         ]
       )
     )

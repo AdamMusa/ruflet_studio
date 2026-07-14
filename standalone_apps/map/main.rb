@@ -65,10 +65,10 @@ Ruflet.run do |page|
                 map_control.center_on(center, zoom: 13)
               }),
               text_button(content: text(value: "Zoom in"), on_click: ->(_e) {
-                map_control.zoom_in(delta: 1)
+                map_control.zoom_in
               }),
               text_button(content: text(value: "Zoom out"), on_click: ->(_e) {
-                map_control.zoom_out(delta: 1)
+                map_control.zoom_out
               })
             ]
           ),
