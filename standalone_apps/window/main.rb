@@ -14,7 +14,8 @@ Ruflet.run do |page|
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"
   status = text(value: "", style: { size: 12, color: "#6b7280" })
-  window = page.window(key: "studio_window", width: 900, height: 700, resizable: true, visible: true)
+  window = page.window
+  page.update(window, width: 900, height: 700, resizable: true, visible: true)
   page.add(
     container(
       expand: true,

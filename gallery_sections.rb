@@ -3424,7 +3424,8 @@ end
 module Showcase
   module SectionsMedia
     def build_window(page, status)
-      window = page.window(key: "studio_window", width: 900, height: 700, resizable: true, visible: true)
+      window = page.window
+      page.update(window, width: 900, height: 700, resizable: true, visible: true)
 
       column(
         spacing: 8,
