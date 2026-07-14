@@ -8,7 +8,7 @@ Ruflet.run do |page|
   page.theme_mode = "system"
   page.bgcolor = "#ffffff"
   status_text = text(value: "Semantics service registered.")
-  page.semantics_service(
+  semantics = page.semantics_service(
     key: "studio_semantics_service",
     data: { "message" => "Showcase semantics service sample" }
   )
@@ -24,16 +24,16 @@ Ruflet.run do |page|
           children: [
             text(value: "Semantics Service"),
             status_text,
-            button(
-              content: "Refresh data",
-              on_click: lambda { |_e|
-                page.semantics_service(
-                  key: "studio_semantics_service",
-                  data: { "message" => "Updated from Showcase" }
-                )
-                page.update(status_text, value: "Semantics service data refreshed.")
-              }
-            )
+            button(content: "Announce message", on_click: lambda { |_e|
+              semantics.announce_message("Ruflet semantics service is working", on_result: lambda { |_result, error|
+                page.update(status_text, value: error ? "Announcement error: #{error}" : "Accessibility message announced.")
+              })
+            }),
+            button(content: "Accessibility features", on_click: lambda { |_e|
+              semantics.get_accessibility_features(on_result: lambda { |result, error|
+                page.update(status_text, value: error ? "Features error: #{error}" : "Features: #{result.inspect}")
+              })
+            })
           ]
         )
       )

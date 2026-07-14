@@ -2038,36 +2038,23 @@ module Showcase
 end
 
 # === showcase/sections_media/clipboard.rb ===
-require "tmpdir"
-require "fileutils"
-
 module Showcase
   module SectionsMedia
     def build_clipboard(page, _status)
-      page.clipboard
+      clipboard = page.clipboard
 
       state_text = text(value: "")
-      files_column = column(horizontal_alignment: Ruflet::CrossAxisAlignment::CENTER, spacing: 0, children: [])
       clipboard_in_flight = false
 
-      temp_dir = File.join(Dir.tmpdir, "ruflet_clipboard_files_example")
-      FileUtils.mkdir_p(temp_dir)
-      sample_files = [
-        File.join(temp_dir, "sample_1.txt"),
-        File.join(temp_dir, "sample_2.txt")
-      ]
-      File.write(sample_files[0], "Clipboard sample file 1\n")
-      File.write(sample_files[1], "Clipboard sample file 2\n")
-
-      set_files_btn = button(
-        content: "Set example files to clipboard",
+      set_text_btn = button(
+        content: "Copy sample text",
         on_click: ->(_e) do
           next if clipboard_in_flight
 
           clipboard_in_flight = true
-          page.update(state_text, value: "Setting clipboard files...")
-          page.set_clipboard_files(
-            sample_files,
+          page.update(state_text, value: "Writing clipboard text...")
+          clipboard.set(
+            "Hello from Ruflet",
             timeout: 6,
             on_result: lambda { |result, error|
               clipboard_in_flight = false
@@ -2075,40 +2062,28 @@ module Showcase
                 page.update(state_text, value: "Clipboard error: #{error}")
                 next
               end
-              page.update(files_column, children: [])
-              page.update(state_text, value: "Set #{sample_files.length} file references to clipboard (result: #{result}).")
+              page.update(state_text, value: "Copied text to clipboard (result: #{result.inspect}).")
             }
           )
         end
       )
 
-      get_files_btn = button(
-        content: "Get files from clipboard",
+      get_text_btn = button(
+        content: "Read clipboard text",
         on_click: ->(_e) do
           next if clipboard_in_flight
 
           clipboard_in_flight = true
-          page.update(state_text, value: "Reading clipboard files...")
-          page.get_clipboard_files(
+          page.update(state_text, value: "Reading clipboard text...")
+          clipboard.get(
             timeout: 6,
             on_result: lambda { |result, error|
               clipboard_in_flight = false
               if error && !error.to_s.empty?
                 page.update(state_text, value: "Clipboard error: #{error}")
-                page.update(files_column, children: [])
                 next
               end
-
-              paths = Array(result).map(&:to_s).reject(&:empty?)
-              rows = paths.map do |path|
-                row(
-                  alignment: Ruflet::MainAxisAlignment::CENTER,
-                  children: [text(value: path, selectable: true)]
-                )
-              end
-
-              page.update(state_text, value: "Read #{paths.length} file reference(s) from clipboard.")
-              page.update(files_column, children: rows)
+              page.update(state_text, value: "Clipboard: #{result.inspect}")
             }
           )
         end
@@ -2145,11 +2120,10 @@ module Showcase
         content: column(
           horizontal_alignment: Ruflet::CrossAxisAlignment::CENTER,
           children: [
-            set_files_btn,
-            get_files_btn,
+            set_text_btn,
+            get_text_btn,
             get_image_btn,
-            state_text,
-            files_column
+            state_text
           ]
         )
       )
@@ -2877,10 +2851,13 @@ module Showcase
           children: [
             capture_area,
             status_text,
-            button(
-              content: "Refresh",
-              on_click: ->(_e) { page.update(status_text, value: "Screenshot control refreshed.") }
-            )
+            button(content: "Capture", on_click: lambda { |_e|
+              page.update(status_text, value: "Capturing…")
+              capture_area.capture(on_result: lambda { |result, error|
+                size = result.respond_to?(:bytesize) ? result.bytesize : result.to_s.bytesize
+                page.update(status_text, value: error ? "Capture error: #{error}" : "Captured #{size} PNG bytes.")
+              })
+            })
           ]
         )
       )
@@ -2932,7 +2909,7 @@ module Showcase
     def build_semantics_service(page, _status)
       status_text = text(value: "Semantics service registered.")
 
-      page.semantics_service(
+      semantics = page.semantics_service(
         key: "studio_semantics_service",
         data: { "message" => "Showcase semantics service sample" }
       )
@@ -2945,16 +2922,16 @@ module Showcase
           children: [
             text(value: "Semantics Service"),
             status_text,
-            button(
-              content: "Refresh data",
-              on_click: lambda { |_e|
-                page.semantics_service(
-                  key: "studio_semantics_service",
-                  data: { "message" => "Updated from Showcase" }
-                )
-                page.update(status_text, value: "Semantics service data refreshed.")
-              }
-            )
+            button(content: "Announce message", on_click: lambda { |_e|
+              semantics.announce_message("Ruflet semantics service is working", on_result: lambda { |_result, error|
+                page.update(status_text, value: error ? "Announcement error: #{error}" : "Accessibility message announced.")
+              })
+            }),
+            button(content: "Accessibility features", on_click: lambda { |_e|
+              semantics.get_accessibility_features(on_result: lambda { |result, error|
+                page.update(status_text, value: error ? "Features error: #{error}" : "Features: #{result.inspect}")
+              })
+            })
           ]
         )
       )

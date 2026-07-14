@@ -37,10 +37,13 @@ Ruflet.run do |page|
           children: [
             capture_area,
             status_text,
-            button(
-              content: "Refresh",
-              on_click: ->(_e) { page.update(status_text, value: "Screenshot control refreshed.") }
-            )
+            button(content: "Capture", on_click: lambda { |_e|
+              page.update(status_text, value: "Capturing…")
+              capture_area.capture(on_result: lambda { |result, error|
+                size = result.respond_to?(:bytesize) ? result.bytesize : result.to_s.bytesize
+                page.update(status_text, value: error ? "Capture error: #{error}" : "Captured #{size} PNG bytes.")
+              })
+            })
           ]
         )
       )
