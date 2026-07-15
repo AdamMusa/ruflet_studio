@@ -16,18 +16,22 @@ module Gallery
       )
 
       build_banner = lambda do
-        control(
+        banner_control = nil
+        banner_control = control(
           :banner,
           open: true,
           leading: icon(icon: "info"),
           content: text(value: "Backup completed successfully."),
           actions: [
-            text_button(content: text(value: "Dismiss"), on_click: ->(_e) { page.pop_dialog })
+            text_button(content: text(value: "Dismiss"), on_click: ->(_e) { page.close_banner(banner_control) })
           ]
         )
       end
 
       column(
+        expand: true,
+        scroll: "auto",
+        horizontal_alignment: "stretch",
         spacing: 12,
         children: [
           status,
@@ -100,7 +104,7 @@ module Gallery
                 children: [
                   text(value: "Banners", style: { size: 14, weight: "w600" }),
                   text_button(content: text(value: "Show banner"), on_click: ->(_e) {
-                    page.show_dialog(build_banner.call)
+                    page.show_banner(build_banner.call)
                   })
                 ]
               )

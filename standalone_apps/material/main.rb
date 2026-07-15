@@ -19,12 +19,13 @@ Ruflet.run do |page|
     ]
   )
   build_banner = lambda do
-    banner(
+    banner_control = nil
+    banner_control = banner(
       open: true,
       leading: icon(icon: "info"),
       content: text(value: "Backup completed successfully."),
       actions: [
-        text_button(content: text(value: "Dismiss"), on_click: ->(_e) { page.pop_dialog })
+        text_button(content: text(value: "Dismiss"), on_click: ->(_e) { page.close_banner(banner_control) })
       ]
     )
   end
@@ -34,6 +35,9 @@ Ruflet.run do |page|
       alignment: "center",
       padding: 24,
       content: column(
+        expand: true,
+        scroll: "auto",
+        horizontal_alignment: "stretch",
         spacing: 12,
         children: [
           status,
@@ -101,7 +105,7 @@ Ruflet.run do |page|
                 children: [
                   text(value: "Banners", style: { size: 14, weight: "w600" }),
                   text_button(content: text(value: "Show banner"), on_click: ->(_e) {
-                    page.show_dialog(build_banner.call)
+                    page.show_banner(build_banner.call)
                   })
                 ]
               )

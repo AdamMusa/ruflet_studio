@@ -41,7 +41,8 @@ module Gallery
         )
       )
 
-      column(
+      list_view(
+        expand: true,
         spacing: 12,
         children: [
           status,
@@ -50,37 +51,31 @@ module Gallery
           control(:cupertino_switch, label: "Switch"),
           control(:cupertino_slider, min: 0, max: 100, divisions: 10, value: 50),
           radio_group_control,
-          column(
-            spacing: 8,
-            children: [
-              cupertino_button(
-                content: text(value: "Show Dialog"),
-                on_click: ->(_e) { page.show_dialog(cupertino_dialog) }
-              ),
-              cupertino_button(
-                content: text(value: "Show Picker"),
-                on_click: ->(_e) {
-                  page.show_dialog(control(:cupertino_bottom_sheet, content: cupertino_picker, height: 216, padding: { top: 6 }))
-                }
-              )
-            ]
+          cupertino_button(
+            height: 44,
+            content: text(value: "Show Dialog"),
+            on_click: ->(_e) { page.show_dialog(cupertino_dialog) }
           ),
-          column(
-            spacing: 8,
-            children: [
-              cupertino_button(
-                content: text(value: "Show DatePicker"),
-                on_click: ->(_e) {
-                  page.show_dialog(control(:cupertino_bottom_sheet, content: control(:cupertino_date_picker), height: 216, padding: { top: 6 }))
-                }
-              ),
-              cupertino_button(
-                content: text(value: "Show TimerPicker"),
-                on_click: ->(_e) {
-                  page.show_dialog(control(:cupertino_bottom_sheet, content: control(:cupertino_timer_picker), height: 216, padding: { top: 6 }))
-                }
-              )
-            ]
+          cupertino_button(
+            height: 44,
+            content: text(value: "Show Picker"),
+            on_click: ->(_e) {
+              page.show_bottom_sheet(control(:cupertino_bottom_sheet, content: cupertino_picker, height: 216, padding: { top: 6 }))
+            }
+          ),
+          cupertino_button(
+            height: 44,
+            content: text(value: "Show DatePicker"),
+            on_click: ->(_e) {
+              page.show_bottom_sheet(control(:cupertino_bottom_sheet, content: control(:cupertino_date_picker), height: 216, padding: { top: 6 }))
+            }
+          ),
+          cupertino_button(
+            height: 44,
+            content: text(value: "Show TimerPicker"),
+            on_click: ->(_e) {
+              page.show_bottom_sheet(control(:cupertino_bottom_sheet, content: control(:cupertino_timer_picker), height: 216, padding: { top: 6 }))
+            }
           )
         ]
       )
