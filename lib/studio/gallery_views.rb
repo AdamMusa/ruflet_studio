@@ -34,7 +34,7 @@ end
 # the responsive multi-column grid.
 def gallery_grid(page)
   query = page.query["q"].to_s.strip
-  examples = showcase_gallery_examples
+  examples = gallery_examples
   unless query.empty?
     needle = query.downcase
     examples = examples.select { |it| "#{it[:title]} #{it[:description]}".downcase.include?(needle) }

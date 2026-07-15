@@ -2,7 +2,7 @@
 
 def preview_for(page, slug, large:)
   item = example(slug)
-  return showcase_preview(page, item, large: large) if item[:showcase]
+  return gallery_preview(page, item, large: large) if item[:gallery]
 
   case slug
   when "calculator"
@@ -22,16 +22,16 @@ def preview_for(page, slug, large:)
   end
 end
 
-def showcase_status
+def gallery_status
   text(value: "", style: { color: MUTED, size: 12 })
 end
 
-def showcase_preview(page, item, large:)
+def gallery_preview(page, item, large:)
   content =
     if item[:component_slug]
-      SHOWCASE_PREVIEW.build_component_detail(page, showcase_status, item[:component_slug])
+      GALLERY_PREVIEW.build_component_detail(page, gallery_status, item[:component_slug])
     else
-      SHOWCASE_PREVIEW.public_send(item[:builder], page, showcase_status)
+      GALLERY_PREVIEW.public_send(item[:builder], page, gallery_status)
     end
 
   container(

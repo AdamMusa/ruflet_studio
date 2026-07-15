@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 def examples_for(category_slug)
-  showcase_examples.select { |item| item[:category] == category_slug }
+  gallery_examples.select { |item| item[:category] == category_slug }
 end
 
 def example(slug)
-  showcase_examples.find { |item| item[:slug] == slug } ||
+  gallery_examples.find { |item| item[:slug] == slug } ||
     EXAMPLES.find { |item| item[:slug] == slug } ||
     EXAMPLES.first
 end

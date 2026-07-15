@@ -10,10 +10,10 @@ end.freeze
 # one at a time, where it works fine.
 def gallery_card_thumb(item)
   container(expand: true, alignment: "center", clip_behavior: "hardEdge",
-    content: showcase_thumbnail(item))
+    content: gallery_thumbnail(item))
 end
 
-def showcase_thumbnail(item)
+def gallery_thumbnail(item)
   slug = item[:slug]
   return compact_counter_thumbnail if slug == "counter"
   return static_todo_thumbnail if slug == "todo"
@@ -163,7 +163,7 @@ end
 
 def thumbnail_for(page, slug)
   item = example(slug)
-  return gallery_card_thumb(item) if item[:showcase]
+  return gallery_card_thumb(item) if item[:gallery]
 
   case slug
   when "calculator"
