@@ -8,7 +8,9 @@ module Gallery
     def build_audio_recorder(page, status)
       recorder = page.audio_recorder(key: "studio_audio_recorder")
       recording_path = nil
+      recording_index = 0
       playback = nil
+      playback_generation = 0
 
       spinner = container(visible: false, width: 42, height: 42, alignment: "center",
                           content: spinkit(pulse: { color: "#ef4444", size: 34 }))
@@ -24,11 +26,15 @@ module Gallery
 
       autoplay_recording = lambda do |path|
         page.remove_service(playback) if playback
+        playback_generation += 1
+        generation = playback_generation
         playback = page.audio(
           src: path,
           autoplay: true,
           release_mode: "stop",
           on_state_change: lambda do |event|
+            next unless generation == playback_generation
+
             data = event.respond_to?(:data) ? event.data : event
             state = data.is_a?(Hash) ? (data["state"] || data[:state]) : data
             message = case state.to_s
@@ -38,6 +44,8 @@ module Gallery
             page.update(status, value: message) if message
           end,
           on_error: lambda do |event|
+            next unless generation == playback_generation
+
             data = event.respond_to?(:data) ? event.data : event
             page.update(status, value: "Playback error: #{data}")
           end
@@ -48,6 +56,13 @@ module Gallery
       # Pure Ruby: resolve a writable path, then record to it (same flow as the
       # gallery reference). No client/Dart changes.
       start = lambda do |_e|
+        playback_generation += 1
+        previous_playback = playback
+        playback = nil
+        if previous_playback
+          previous_playback.release(on_result: ->(_result, _error) { page.remove_service(previous_playback) })
+        end
+
         page.update(status, value: "Preparing recording…")
         page.get_application_documents_directory(on_result: ->(documents_dir, path_error) {
           if path_error || documents_dir.to_s.empty?
@@ -55,7 +70,8 @@ module Gallery
             next
           end
 
-          recording_path = File.join(documents_dir.to_s, "gallery_recording.wav")
+          recording_index += 1
+          recording_path = File.join(documents_dir.to_s, "gallery_recording_#{recording_index}.wav")
           next unless prepare_recorder_output_path(page, recording_path, status)
 
           recorder.has_permission(on_result: ->(allowed, recorder_error) {
